@@ -1,15 +1,4 @@
-# [ThermOS](https://mholgatem.github.io/ThermOS/)
-Another Raspberry Pi Thermostat<br>
-Checkout the **[PROJECT SITE](https://mholgatem.github.io/ThermOS/)** for more details!
-
-## There's a web interface
-<img src="../gh-pages/images/index.jpg">
-
-## Run on a schedule
-<img src="../gh-pages/images/schedule.jpg">
-
-## Forecasts [Powered by Forecast.io](http://www.forecast.io)
-<img src="../gh-pages/images/weather.jpg">
+[<img src="../gh-pages/images/banner.jpg">](https://mholgatem.github.io/ThermOS/)
 
 ## Icon Credits
 The following icons came from [thenounproject.com](https://thenounproject.com)<br>
