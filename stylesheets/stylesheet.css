@@ -1,3 +1,14 @@
+@font-face {
+    font-family: agencyfb;
+    src: url(../fonts/AGENCYR.TTF);
+}
+
+@font-face {
+    font-family: agencyfb;
+    src: url(../fonts/AGENCYB.TTF);
+    font-weight: bold;
+}
+
 * {
   box-sizing: border-box; }
 
@@ -7,11 +18,14 @@ body {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #606c71; }
+  color: white;
+  background: #333;
+  }
 
 a {
-  color: #1e6bb8;
-  text-decoration: none; }
+  color: #4798da;
+  text-decoration: none;
+  }
   a:hover {
     text-decoration: underline; }
 
@@ -57,7 +71,8 @@ a {
   color: #fff;
   text-align: center;
   background-color: #159957;
-  background-image: linear-gradient(120deg, #155799, #159957); }
+  background-image: linear-gradient(120deg, #2161a8, rgb(0, 189, 189));
+  }
 
 @media screen and (min-width: 64em) {
   .page-header {
@@ -73,7 +88,12 @@ a {
 
 .project-name {
   margin-top: 0;
-  margin-bottom: 0.1rem; }
+  margin-bottom: 0.1rem;
+  font-family: agencyfb;
+  letter-spacing: 38px;
+  color: rgba(2, 10, 12, 0.7);
+  text-shadow: 1px 1px 5px #a7e7f9, -1px -1px 1px #19a1ce;
+  }
 
 @media screen and (min-width: 64em) {
   .project-name {
@@ -106,13 +126,24 @@ a {
 
 .main-content :first-child {
   margin-top: 0; }
-.main-content img {
-  max-width: 100%; }
+.main-content  img {
+    max-width: 100%; }
+.main-content > img {
+    background: rgba(0,0,0,.5);
+    padding: 14px;
+    box-shadow: inset 0 0 20px black;
+    border: 3px solid #444;
+}
 .main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-weight: normal;
-  color: #159957; }
+  color: rgb(255,192,0);
+  font-family: agencyfb;
+  font-size: 30px;
+  letter-spacing: 6px;
+  font-weight: bold;
+  }
 .main-content p {
   margin-bottom: 1em; }
 .main-content code {
@@ -231,6 +262,37 @@ a {
 
 .site-footer-credits {
   color: #819198; }
+  
+.gridder-navigation{
+  height: 0;
+}
+.gridder-navigation > a {
+    position: relative;
+    top: 25px;
+    padding: 5px 12px;
+    background: #333;
+    border-radius: 11px;
+    font-size: 25px;
+    font-weight: bold;
+    color: white;
+    opacity: .8;
+    margin: 5px;
+    line-height: 0px;
+    height: 10px;
+}
+
+.gridder-expanded-content > span{
+    position: absolute;
+    margin: 0 5px;
+    top: 10px;
+    color: rgb(255,192,0);
+    background-color: rgba(30,30,30,0.8);
+    padding: 12px;
+    font-size: 29px;
+    font-family: 'agencyfb';
+    letter-spacing: 3px;
+    right: 10px;
+}
 
 @media screen and (min-width: 64em) {
   .site-footer {
