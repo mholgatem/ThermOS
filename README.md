@@ -1,4 +1,4 @@
-# ThermOS
+# [ThermOS](https://mholgatem.github.io/ThermOS/)
 Another Raspberry Pi Thermostat<br>
 Checkout the **[PROJECT SITE](https://mholgatem.github.io/ThermOS/)** for more details!
 
@@ -8,7 +8,7 @@ Checkout the **[PROJECT SITE](https://mholgatem.github.io/ThermOS/)** for more d
 ## Run on a schedule
 <img src="../gh-pages/images/schedule.jpg">
 
-## Local Forecasts
+## Forecasts [Powered by Forecast.io](http://www.forecast.io)
 <img src="../gh-pages/images/weather.jpg">
 
 ## Icon Credits
