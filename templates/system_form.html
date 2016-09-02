@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<head>
+    <meta text/html;charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+    
+    <script type='application/javascript' src="/static/fastclick.js"></script>
+    <script type='application/javascript' src="/static/increment.js"></script>
+    <script type='application/javascript' src="/static/jquery.min.js"></script>
+    <script type='application/javascript' src="/static/bootstrap.min.js"></script>
+
+    <script type="application/javascript">
+        window.addEventListener('load', function() {
+            var plus, minus;
+
+            plus = document.getElementById('plus');
+            minus = document.getElementById('minus');
+
+            // Android 2.2 needs FastClick to be instantiated before the other listeners so that the stopImmediatePropagation hack can work.
+            FastClick.attach(minus);
+            FastClick.attach(plus);
+
+            plus.addEventListener('click', function(event) {
+                increment(document.getElementById('target'))
+            }, false);
+
+            minus.addEventListener('click', function(event) {
+                decrement(document.getElementById('target'))
+            }, false);
+        }, false);
+        
+        $(function() {
+        var selectBox = $("[name='mode']")
+        if(selectBox.val() == 'COOL' || selectBox.val() == 'HEAT') {
+            $('.holdTempContainer').show();
+            $('#target').val(selectBox.find(":selected").data("value"));
+        } else {
+            $('.holdTempContainer').hide(); 
+        }
+        $("[name='mode']").change(function(){
+            if(selectBox.val() == 'COOL' || selectBox.val() == 'HEAT') {
+                $('.holdTempContainer').show(); 
+                $('#target').val(selectBox.find(":selected").data("value"));
+            } else {
+                $('.holdTempContainer').hide(); 
+            } 
+        });
+    });
+    </script>
+
+</head>
+<body class="hold">
+
+    <center style="position:absolute; top:0; left:0;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+              {{ message | safe }}
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </center>
+
+    <form action="{{ url_for('system_submit') }}" method="POST">
+        <div id="row1">
+            <div>
+                <div style="margin: 0 auto; text-align: center; display: inline-block;">
+                    <div class="styled-select blue semi-square" style="margin: 15px; text-align: center;">
+                        <select class="styled-select blue semi-square" name="mode">
+                          <option value="OFF" data-value="" {{ offSelect }}>Off</option>
+                          <option value="COOL" data-value="{{ coolTemp }}" {{ coolSelect }}>Cool</option>
+                          <option value="HEAT" data-value="{{ heatTemp }}" {{ heatSelect }}>Heat</option>
+                          <option value="AUTO" data-value="" {{ autoSelect }}>Auto</option>
+                        </select>
+                    </div>
+                    <div class="box-letterpress blue-letterpress holdTempContainer" style="margin: auto;">
+                        <input class="blue-letterpress" type="number" id="target" name="target" value={{ targetTemp }} onClick="this.select();" >
+                        <div class="plusminusContainer">
+                            <div class="box-letterpress blue-letterpress plusminus" id="plus">+</div>
+                            <div class="box-letterpress blue-letterpress plusminus" id="minus">-</div>
+                        </div>
+                    </div>
+                    <ul class="round-nav" style="padding: 0; margin-left: -10px;">
+                    <li>
+                      <a href="#" onclick="$(this).closest('form').submit()">
+                        <span class="btn-icon-set blue-letterpress"></span>
+                        <span class="screen-reader-text">Home</span>
+                      </a>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</body>

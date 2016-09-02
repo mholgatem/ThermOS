@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<meta text/html;charset="utf-8">
+
+<!-- Bootstrap core CSS -->
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+<link href="/static/css/main.css" rel="stylesheet">
+<link href="/static/css/lame.css" rel="stylesheet">
+<script type='application/javascript' src="{{url_for('static',filename='fastclick.js')}}"></script>
+<!-- jquery is kinda overkill, but I doubt anyone besides me will actually use this... -->
+<script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+<script src="{{url_for('static',filename='svg.jquery.js')}}"></script>
+<script src="{{url_for('static',filename='pygal-tooltips.js')}}"></script>
+<script>window.jQuery || document.write('<script src="{{
+  url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+
+<!-- This will update the current indoor temp as fed from getIndoorTemp.py
+	 Refreshes every 5 seconds -->
+<script>
+function updateTemp() {
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_liveTemp",
+    success : function(result){
+        $('#indoorTempDiv').html(result);
+    }
+})
+};
+window.setInterval(function(){
+  updateTemp()
+}, 5000);
+</script>
+
+<script>
+function updateWhatsOn() {
+
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_liveWhatsOn",
+    success : function(result){
+        $('#whatsOnSpan').html(result);
+    }
+})
+};
+
+window.setInterval(function(){
+  updateWhatsOn()
+}, 10000);
+</script>
+
+<script>
+function updateDaemonStatus() {
+
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_liveDaemonStatus",
+    success : function(result){
+        $('#daemonStatusSpan').html(result);
+    }
+})
+};
+
+window.setInterval(function(){
+  updateDaemonStatus()
+}, 30000);
+</script>
+
+
+<script type="application/javascript">
+	window.addEventListener('load', function() {
+		var plus, minus;
+
+		plus = document.getElementById('plus');
+		minus = document.getElementById('minus');
+
+		// Android 2.2 needs FastClick to be instantiated before the other listeners so that the stopImmediatePropagation hack can work.
+		FastClick.attach(minus);
+		FastClick.attach(plus);
+
+		plus.addEventListener('click', function(event) {
+			increment(document.getElementById('target'))
+		}, false);
+
+		minus.addEventListener('click', function(event) {
+			decrement(document.getElementById('target'))
+		}, false);
+	}, false);
+</script>
+
+<!-- Makes them fancy buttons go -->
+<script type=text/javascript src="{{
+  url_for('static', filename='increment.js') }}"></script>
+
+<body onload="updateTemp(); updateWhatsOn(); updateDaemonStatus();">
+
+
+
+<div id="header">
+<center>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+</center>
+<div id="container2">
+	<form action="." method="POST">
+	<div id="container1">
+		<div id="col1">
+			<center>
+			<br><br>
+			<div class="onoffswitch">
+				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{ checked }}>
+				<label class="onoffswitch-label" for="myonoffswitch">
+						<div class="onoffswitch-inner"></div>
+						<div class="onoffswitch-switch"></div>
+				</label>
+			</div> 
+			<div class="plus" id="plus">+</div>
+			<input type="text" id="target" name="target" value={{ targetTemp }}>
+			<div class="minus" id="minus">-</div>
+			<br><br>
+
+		    </center>
+		</div>
+
+		<div id="col2">
+			<center>
+			<!-- the heating / cooling switch -->
+			<div class="switch">
+				<center>
+				{{weatherString|safe}} 
+				<br>
+				<!-- center tags are basically the extent of my web design knowledge. -->
+				<!-- updated by the updateTemp() js function defined above -->
+				Current indoor temp: 
+				<p id="currentTemp"><span id="indoorTempDiv"></span>&deg;</p>
+				Current target temp:
+				<br>
+				<p id="targetTemp">{{targetTemp}}&deg;</p>
+				<br><br>
+				<input type="submit" style="height: 150px; width: 150px" id="goButton" class="goButton" value="Go!">
+				<br>
+				<span id="daemonStatusSpan"></span>
+				<span id="whatsOnSpan"></span>
+				</center>
+			</div>
+			</center>
+		</div>
+	</div>
+	</form>

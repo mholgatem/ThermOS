@@ -1,0 +1,763 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import os
+import subprocess
+import sqlite3
+from datetime import datetime, timedelta
+from flask import *
+import pygal
+import RPi.GPIO as GPIO
+
+import scheduler
+from getIndoorTemp import getIndoorTemp
+
+app = Flask(__name__)
+app.secret_key = 'DErGH65&*jKl990L.:s;6md8hgr53SD'
+
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
+# register custom types
+sqlite3.register_adapter(bool, str)
+sqlite3.register_converter("BOOLEAN", lambda v: 'T' in v)
+
+# TABLES: status, schedule, settings
+thermConn = sqlite3.connect("logs/thermostat.db", 
+                       detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES, #use this to save datetime
+                       check_same_thread=False)
+# returned rows can be called with case-insensitive column names
+thermConn.row_factory = sqlite3.Row
+thermCursor = thermConn.cursor()
+
+# get CONFIG settings
+CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
+
+# TABLES: logging, hourlyWeather, dailyWeather
+logsConn = sqlite3.connect("logs/logs.db", 
+                    detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES, #use this to save datetime
+                   check_same_thread=False) 
+# returned rows can be called with case-insensitive column names
+logsConn.row_factory = sqlite3.Row 
+logsCursor = logsConn.cursor()
+
+#load any scheduled items
+calendar = scheduler.Calendar()
+
+#initialize status
+if 'BCM' in CONFIG['numbering_scheme']:
+    GPIO.setmode(GPIO.BCM)
+else:
+    GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+try:
+    GPIO.setup([CONFIG['heater_pin'], CONFIG['ac_pin'], CONFIG['fan_pin']], GPIO.OUT)
+    settingsRedirect = False
+except ValueError:
+    settingsRedirect = True
+    
+def getWeatherGraph():
+    #get latest 24 hours, hourly[0] = current hour
+    startTime = str(datetime.now() - timedelta(hours=1))[:19]
+    hourly = logsCursor.execute('select * from hourlyWeather \
+                                 where datetime(date) >= datetime("{0}")'.format(startTime)).fetchall()
+
+    times = []
+    temps = []
+    majorX = ["Now"]
+    for hourlyData in hourly:
+        if hourlyData == hourly[0]:
+            time = "Now"
+        else:
+            time = str(hourlyData['date'].hour % 12)
+            time = "12" if time == "0" else time
+            time += "am" if hourlyData['date'].hour < 12 else "pm"
+            if time == "12am":
+                time = hourlyData['date'].strftime('%a')
+                majorX.append(time)
+        times.append(time)
+        temps.append(hourlyData['temperature'])
+
+    pygal.style.DarkSolarizedStyle.label_font_family = 'agencyfb'
+    pygal.style.DarkSolarizedStyle.label_font_family = 'agencyfb'
+    pygal.style.DarkSolarizedStyle.label_font_size = 35
+
+    pygal.style.DarkSolarizedStyle.value_font_family = 'agencyfb'
+    pygal.style.DarkSolarizedStyle.value_font_size = 25
+    pygal.style.DarkSolarizedStyle.value_colors = ('white','white', 'white')
+    
+    pygal.style.DarkSolarizedStyle.major_label_font_family = 'agencyfb'
+    pygal.style.DarkSolarizedStyle.major_label_font_size = 35
+    
+    pygal.style.DarkSolarizedStyle.tooltip_font_family = 'agencyfb'
+    pygal.style.DarkSolarizedStyle.tooltip_font_size = 25
+    
+    pygal.style.DarkSolarizedStyle.colors = ('rgba(246,190,28,.7)', 'rgba(0, 255, 255, 0.45)', '#E95355', '#E87653', '#E89B53')
+    pygal.style.DarkSolarizedStyle.background = 'rgba(31, 53, 70, 0.01)'
+    pygal.style.DarkSolarizedStyle.plot_background = 'none'
+    
+    
+    noDataText = "Data Not Available" if CONFIG['weather_enabled'] else "API Not Enabled"
+    #clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
+    line_graph = pygal.Line( width = 5000, 
+                            height = 250,
+                            margin = 10,
+                            margin_left = -50,
+                            dots_size = 15,
+                            explicit_size = True, 
+                            #title = "Currently {0}&deg;{1}".format(hourly[0]['temperature'], CONFIG['units']), 
+                            interpolate = "cubic",
+                            fill = True,
+                            show_legend = False,
+                            #legend_box_size=25,
+                            print_values=True,
+                            #print_values_position='top',
+                            show_x_guides=True,
+                            show_y_labels=False,
+                            no_data_text=noDataText,
+                            style = pygal.style.DarkSolarizedStyle)
+    line_graph.x_labels = times
+    line_graph.x_labels_major = majorX
+    line_graph.value_formatter = lambda x: "%.1f" % x
+    line_graph.add("Today", temps)
+
+    return line_graph.render().decode("utf-8").replace("&amp;","&")
+    
+def getCurrentWeather():
+    if CONFIG['weather_enabled']:
+        #get latest 24 hours, hourly[0] = current hour
+        startTime = str(datetime.now() - timedelta(hours=1))[:19]
+        hourly = logsCursor.execute('select * from hourlyWeather \
+                                     where datetime(date) >= datetime("{0}")'.format(startTime)).fetchone()
+        
+        if hourly:
+            currentTemp = '<span class="unit-{1}" id="outdoorTempSpan">{0:.0f}</span>'.format( hourly['temperature'], 
+                                                                                                   CONFIG['units'] )
+                                                                                                   
+            #clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
+            currentIcon = '<img id="currentWeatherIcon" src="static/images/weather/icons/128/{0}.png">'.format(hourly['icon'])
+            currentHumidity = '<p id="outdoorHumidity"> \
+                                    <span id="humidity">{0:.0f}%</span> \
+                                    <span id="humidityLabel">Humidity</span> \
+                                </p>'.format(hourly['humidity'] * 100)
+            
+            html = '<div id="currentWeather">{0}{1}{2}</div>'.format(currentTemp, currentIcon, currentHumidity)
+            return html.decode("utf-8").replace("&amp;","&")
+            
+        return '<div id="currentWeather"><span style="font-size:60px;">Weather not yet populated</span></div>'
+
+        
+def getDailyWeather():
+    if CONFIG['weather_enabled']:
+        logsCursor.execute("SELECT * FROM (SELECT * FROM dailyWeather ORDER BY date DESC LIMIT 8) ORDER BY date ASC")
+        daily = [dict(row) for row in logsCursor]
+        for day in daily:
+            
+            if day['date'] == daily[0]['date']:
+                day['weekday'] = 'TODAY'
+            else:
+                day['weekday'] = day['date'].strftime("%a").upper()
+            day['date'] = day['date'].strftime("%b %d")
+            day['tempMinTime'] = day['tempMinTime'].strftime("%I:%M %p").lstrip("0")
+            day['tempMaxTime'] = day['tempMaxTime'].strftime("%I:%M %p").lstrip("0")
+            day['sunriseTime'] = day['sunriseTime'].strftime("%I:%M %p").lstrip("0")
+            day['sunsetTime'] = day['sunsetTime'].strftime("%I:%M %p").lstrip("0")
+            day['visibility'] = "{0} mi.".format(day['visibility']) if day['visibility'] != None else 'N/A'
+            day['cloudCover'] = "{:.0%}".format(day['cloudCover']) if day['cloudCover'] != None else 'N/A'
+            day['humidity'] = "{:.0%}".format(day['humidity']) if day['humidity'] != None else 'N/A'
+            day['precipProbability'] = "{:.0%}".format(day['precipProbability']) if day['precipProbability'] != None else 'N/A'
+            if day['moonPhase']:
+                if day['moonPhase'] <= 0.5:
+                    day['moonPhase'] = "{:.0%}".format(day['moonPhase'] * 2.0)
+                else:
+                    day['moonPhase'] = "{:.0%}".format((day['moonPhase'] * 2.0) - 2)
+            else:
+                day['moonPhase'] = '0%'
+            day['pressure'] = "{0} mb.".format(day['pressure']) if day['pressure'] else 'N/A'
+            if day['windBearing']:
+                if day['windBearing'] > 337:
+                    day['windBearing'] = 'N'
+                elif day['windBearing'] > 292:
+                    day['windBearing'] = 'NW'
+                elif day['windBearing'] > 247:
+                    day['windBearing'] = 'W'    
+                elif day['windBearing'] > 202:
+                    day['windBearing'] = 'SW'
+                elif day['windBearing'] > 157:
+                    day['windBearing'] = 'S'
+                elif day['windBearing'] > 112:
+                    day['windBearing'] = 'SE'
+                elif day['windBearing'] > 67:
+                    day['windBearing'] = 'E'
+                elif day['windBearing'] > 22:
+                    day['windBearing'] = 'NE'
+                elif day['windBearing'] >= 0:
+                    day['windBearing'] = 'N'
+            else:
+                day['windBearing'] = ''
+                
+            
+                
+            
+        return daily
+    return []
+
+def getCurrentWeatherAlerts():
+    if CONFIG['weather_enabled']:
+        #get latest week, daily[0] = current day
+        daily = logsCursor.execute('SELECT * FROM dailyWeather WHERE date(date) = date("{0}")'.format(datetime.now().date()) ).fetchone()
+        html = '<div id="weatherAlertContainer">{0}</div>'.format(daily['alert'] if daily and daily['alert'] else "")
+        return html.decode("utf-8").replace("&amp;","&")
+    return '<div id="weatherAlertContainer"></div>'
+
+def getWhatsOn():
+    
+    heatStatus = "ON" if CONFIG['heater_pin'] and GPIO.input(CONFIG['heater_pin']) else "OFF"
+    coolStatus = "ON" if CONFIG['ac_pin'] and GPIO.input(CONFIG['ac_pin']) else "OFF"
+    fanStatus = "ON" if CONFIG['fan_pin'] and GPIO.input(CONFIG['fan_pin']) else "OFF"
+
+    heatString = '<p id="heat">HEAT: {0} </p>'.format(heatStatus)
+    coolString = '<p id="cool">COOL: {0} </p>'.format(coolStatus)
+    fanString = '<p id="fan">FAN: {0} </p>'.format(fanStatus)
+
+    return heatString + coolString + fanString
+
+def getDaemonStatus():
+    try:
+        if 'active' in subprocess.check_output(['systemctl', 'is-active', 'thermostat-daemon']):
+            return '<p id="daemonRunning"> Daemon is running. </p>'
+        else:
+            return '<p id="daemonNotRunning"> DAEMON IS NOT RUNNING. </p>'
+    except:
+        return '<p id="daemonNotRunning"> DAEMON IS NOT RUNNING. </p>'
+
+
+def getValueByType(xName, xValue):
+    if not xValue:
+        return ''
+    try:
+        if 'int' in xName[:3]:
+            return int(xValue)
+        if 'float' in xName[:5]:
+            return float(xValue)
+        if ('option' in xName[:6] 
+            or 'text' in xName[:4]):
+            return xValue
+    except:
+        return None
+
+def reloadDaemon():
+    global CONFIG, calendar
+    subprocess.call(("systemctl", "reload", "thermostat-daemon"))
+    CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
+    calendar.loadCalendar(forceReload = True)
+    
+@app.route('/')
+def main_form():
+    status = thermCursor.execute('SELECT * FROM status').fetchone()
+    whatsOn = getWhatsOn()
+    daemonStatus = getDaemonStatus()
+    
+    if settingsRedirect:
+        flash("you must setup your system before you can continue","info")
+        
+    return render_template("index.html", openSettings = '$( "#settings-btn" ).click();' if settingsRedirect else '',
+                                        unit = CONFIG['units'],
+                                        targetTemp = status['target_cool'], 
+                                        mode = status['mode'],
+                                        fanStatus = status['fan_mode'],
+                                        systemStatus = status['mode'],
+                                        daemonStatus = daemonStatus, 
+                                        whatsOn = whatsOn,
+                                        weatherVisible = 'visible' if CONFIG['weather_enabled'] else 'hidden',
+                                        alerts = getCurrentWeatherAlerts())
+
+                                        
+                                        
+@app.route('/schedule')
+def schedule_form():
+    options = thermCursor.execute('SELECT * FROM schedule where not id = -1').fetchall() 
+    return render_template("schedule_form.html", options=options)
+
+@app.route('/schedule/delete', methods=['POST'])
+def schedule_delete():
+    if 'id' in request.form:
+        thermCursor.execute('DELETE FROM schedule WHERE id = (?)',request.form['id'])
+        thermConn.commit()
+        reloadDaemon()
+    return redirect(url_for('schedule_form'))
+
+@app.route('/schedule/edit', methods=['GET'])
+def schedule_edit():
+    id = request.args.get('id', '')
+    if id and id != 'new':
+        entry = thermCursor.execute('SELECT * FROM schedule WHERE id = {0}'.format(id)).fetchone()
+    else:
+        entry = {  'id': 'new',
+                'date':'', 
+                'target_cool':'74',
+                'target_heat':'68',
+                'time_on':'12:00 AM',
+                'time_off':'12:00 AM'
+                }
+    return render_template("schedule_edit_form.html", entry=entry)
+
+@app.route('/schedule/edit', methods=['POST'])
+def schedule_submit():
+    entry = {
+                'id': request.form.get('id', ''),
+                'date': request.form.get('date', ''),
+                'target_cool': request.form.get('target_cool', ''),
+                'target_heat': request.form.get('target_heat', ''),
+                'time_on': request.form.get('time_on', ''),
+                'time_off': request.form.get('time_off', '')
+            }
+    
+    date_check = [  'MONDAYS', 
+                    'TUESDAYS', 
+                    'WEDNESDAYS', 
+                    'THURSDAYS', 
+                    'FRIDAYS', 
+                    'SATURDAYS', 
+                    'SUNDAYS', 
+                    'WEEKDAYS', 
+                    'WEEKENDS', 
+                    'ALWAYS' ]
+    
+    # Basic Error/Format Checking
+    found_errors = False
+    if not entry['date'] in date_check and len(entry['date'].split('/')) != 3:
+        flash("Date does not conform to standards","danger")
+        found_errors = True
+        
+    try:
+        if entry['target_heat']:
+            entry['target_heat'] = int(entry['target_heat'])
+        if entry['target_cool']:
+            entry['target_cool'] = int(entry['target_cool'])
+    except:
+        flash("Target temperatures must be a valid number", "danger")
+        found_errors = True
+        
+    if not len(entry['time_on'].split(':')) == 2:
+        flash("'Time on' is not in a recognized format", "danger")
+        found_errors = True
+        
+    if not len(entry['time_off'].split(':')) == 2:
+        flash("'Time off' is not in a recognized format", "danger")
+        found_errors = True
+        
+    if found_errors:
+        return render_template("schedule_edit_form.html", entry=entry)
+    
+    # Update and redirect
+    if entry['id'] == 'new' or entry['id'] == '':
+        thermCursor.execute('INSERT INTO schedule \
+                            (id, target_heat, target_cool, date, time_on, time_off) VALUES (?,?,?,?,?,?)', 
+                            (None, entry['target_heat'], entry['target_cool'], entry['date'], entry['time_on'], entry['time_off']))
+        thermConn.commit()
+        reloadDaemon()
+        return redirect(url_for('schedule_form'))
+    else:
+        thermCursor.execute('INSERT OR REPLACE INTO schedule \
+                            (id, target_heat, target_cool, date, time_on, time_off) VALUES (?,?,?,?,?,?)', 
+                            (entry['id'], entry['target_heat'], entry['target_cool'], entry['date'], entry['time_on'], entry['time_off']))
+        thermConn.commit()
+        reloadDaemon()
+        return redirect(url_for('schedule_form'))
+ 
+
+    return render_template("schedule_edit_form.html", entry=entry)
+
+@app.route("/hold", methods=['POST'])
+def hold_submit():
+
+    text = request.form['target']
+    mode = "cool" if 'onoffswitch' in request.form else "heat"
+    try:
+        newTargetTemp = float(request.form['target'])
+    except:
+        newTargetTemp = None
+
+    if newTargetTemp != None:
+        if mode == "heat":
+            targetHeat = float(newTargetTemp)
+            targetCool = 'HOLD'
+        else:
+            targetHeat = 'HOLD'
+            targetCool = float(newTargetTemp)
+        
+        if request.form['timeFrame'] == "OFF":
+            thermCursor.execute('DELETE FROM schedule WHERE id= -1')
+            thermConn.commit()
+            flash("Temperature hold has been disabled!")
+        else:
+            now = datetime.now()
+            if request.form['timeFrame'] != 'FOREVER':
+                time_frame = float(request.form['timeFrame'])
+                date = now.date().strftime("%Y/%m/%d")
+            else:
+                time_frame = 0
+                date = 'ALWAYS'
+            time_on = (now.time()).strftime("%I:%M %p")
+            time_off = (now + timedelta(hours=time_frame)).time().strftime("%I:%M %p")
+            thermCursor.execute('INSERT OR REPLACE INTO schedule values (?, ?, ?, ?, ?, ?)', 
+                                                        (-1, targetHeat, targetCool, date, time_on, time_off))
+            thermConn.commit()
+            
+            # tell thermostat-daemon to reload config
+            reloadDaemon()
+            flash("Thermostat will {mode} to {temp} for {time} {hours}".format(mode=mode, 
+                                                                       temp=newTargetTemp, 
+                                                                       time = time_frame if time_frame else 'forever',
+                                                                       hours = 'hours' if time_frame else ''), 
+                                                                       'info')
+        return redirect(url_for('hold_form'))
+    else:
+        flash("Must be a valid number", 'danger')
+        return redirect(url_for('hold_form'))
+
+
+@app.route('/hold')
+def hold_form():
+    targetCool, targetHeat, mode, fanMode = thermCursor.execute('SELECT * FROM status').fetchone()
+
+    if mode == "heat":
+        checked = ""
+    else:
+        checked = 'checked'
+    return render_template("hold_form.html", targetTemp = (targetCool + targetHeat) / 2,
+                                             checked = checked)
+                                        
+@app.route('/system')
+def system_form():
+    status = thermCursor.execute('SELECT * FROM status').fetchone()
+    
+    if status['mode'] == "heat":
+        targetTemp = status['target_heat']
+    elif status['mode'] == "cool":
+        targetTemp = status['target_cool']
+    else:
+        (status['target_cool'] + status['target_heat']) / 2
+
+
+    return render_template("system_form.html", offSelect = 'selected' if status['mode'] == 'OFF' else '',
+                                               coolSelect = 'selected' if status['mode'] == 'COOL' else '',
+                                               coolTemp = status['target_cool'],
+                                               heatSelect = 'selected' if status['mode'] == 'HEAT' else '',
+                                               heatTemp = status['target_heat'],
+                                               autoSelect = 'selected' if status['mode'] == 'AUTO' else '',
+                                               targetTemp = (status['target_cool'] + status['target_heat']) / 2)
+                                               
+@app.route('/system', methods=['POST'])
+def system_submit():
+    
+    status = thermCursor.execute('SELECT * FROM status').fetchone()
+    mode = request.form['mode']
+    try:
+        newTargetTemp = float(request.form['target'])
+    except:
+        newTargetTemp = None
+        flash("Must be a valid number!", 'danger')
+    else:
+        if mode == 'COOL':
+            targetCool = newTargetTemp
+            targetHeat = status['target_heat']
+            msg = "Cooling to {0}&deg;{1}".format(targetCool, CONFIG['units'])
+        elif mode == 'HEAT':
+            targetCool = status['target_cool']
+            targetHeat = newTargetTemp
+            msg = "Heating to {0}&deg;{1}".format(targetHeat, CONFIG['units'])
+        else:
+            targetCool = status['target_cool']
+            targetHeat = status['target_heat']
+            if mode == 'OFF':
+                msg = "Turning off system"
+            else:
+                msg = "Now using the schedule"
+        
+        thermCursor.execute('DELETE FROM status')
+        thermCursor.execute('INSERT INTO status VALUES (?, ?, ?, ?)', (targetCool, targetHeat, mode, status['fan_mode']))
+        thermConn.commit()
+        
+        reloadDaemon()
+        flash(msg, 'info')
+
+
+    return redirect(url_for('system_form'))
+                                        
+                                                    
+@app.route("/settings", methods=['POST'])
+def settings_submit():
+    
+    errorList = []
+    formItems = {}
+    
+    debugEnabled = True if 'bool-debug' in request.form else False
+    weatherEnabled = True if 'bool-weather' in request.form else False
+    mailEnabled = True if 'bool-mail' in request.form else False
+    
+    thermElements = (   'option-temperature-units',
+                        'float-active-hysteresis',
+                        'float-inactive-hysteresis',
+                        'option-numbering-scheme',
+                        'int-ac-pin',
+                        'int-heat-pin',
+                        'int-fan-pin',
+                        'float-temperature-offset')
+                        
+    weatherElements = ( 'text-api-key',
+                        'float-latitude',
+                        'float-longitude')
+                        
+    mailElements = (    'float-error-threshold',
+                        'text-smtp-server',
+                        'int-smtp-port',
+                        'text-username',
+                        'text-password',
+                        'text-sender',
+                        'text-recipient')
+        
+                        
+    for key, value in request.form.iteritems():
+        temp = ''
+        temp = getValueByType(key, value)
+        
+        print key, temp
+        if temp != None: # if valid entry
+            formItems[key] = temp
+        else:
+            formItems[key] = ''
+            if ((key in thermElements) or
+                (weatherEnabled and key in weatherElements) or
+                (mailEnabled and key in mailElements)):
+                    temp = key.split('-')
+                    tempType = "Numbers" if temp[0] in ["int", "float"] else "Letters"
+                    errorList.append ("{0} must contain only {1}".format(' '.join(temp[1:]), tempType))
+
+    
+    for e in errorList:
+        flash(e, "danger")
+
+    if not errorList:
+
+        values = (  debugEnabled,
+                    formItems['option-temperature-units'],
+                    formItems['float-active-hysteresis'],
+                    formItems['float-inactive-hysteresis'],
+                    formItems['option-numbering-scheme'],
+                    formItems['int-ac-pin'],
+                    formItems['int-heat-pin'],
+                    formItems['int-fan-pin'],
+                    formItems['float-temperature-offset'],
+                    weatherEnabled,
+                    formItems['text-api-key'],
+                    formItems['float-latitude'],
+                    formItems['float-longitude'],
+                    mailEnabled,
+                    formItems['float-error-threshold'],
+                    formItems['text-smtp-server'],
+                    formItems['int-smtp-port'],
+                    formItems['text-username'],
+                    formItems['text-password'],
+                    formItems['text-sender'],
+                    formItems['text-recipient']
+                    )
+        
+        # save settings to thermostat.db
+        thermCursor.execute('DELETE FROM settings')
+        thermCursor.execute('INSERT INTO settings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', values)
+        thermConn.commit()    
+        del values, formItems
+        
+        # tell thermostat-daemon to reload config
+        reloadDaemon()
+        
+        # reload gpio
+        global CONFIG, settingsRedirect
+        CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
+        if 'BCM' in CONFIG['numbering_scheme']:
+            GPIO.setmode(GPIO.BCM)
+        else:
+            GPIO.setmode(GPIO.BOARD)
+        GPIO.setwarnings(False)
+        try:
+            GPIO.setup([CONFIG['heater_pin'], CONFIG['ac_pin'], CONFIG['fan_pin']], GPIO.OUT)
+            # if user was redirected here, send them to the main page
+            if settingsRedirect:
+                settingsRedirect = False
+                flash("Settings have been saved!", "success")
+                return redirect(url_for('main_form'))
+        except ValueError:
+            flash("Error setting one of the GPIO pins", "danger")
+            
+            
+        flash("Settings have been saved!", "success")
+        return redirect(url_for('settings_form'))
+        
+    # On invalid entry, re-render settings form with current valid entries
+    return render_template("settings_form.html", 
+                            units = formItems['option-temperature-units'],
+                            checkedDebug = 'checked' if debugEnabled else '',
+                            unitCelsius = "selected" if formItems['option-temperature-units'] == 'C' else '',
+                            unitFarenheit = "selected" if formItems['option-temperature-units'] != 'C' else '',
+                            activeHysteresis = formItems['float-active-hysteresis'],
+                            inactiveHysteresis = formItems['float-inactive-hysteresis'],
+                            schemeBoard = "selected" if formItems['option-numbering-scheme'] != 'BCM' else "",
+                            schemeBCM = "selected" if formItems['option-numbering-scheme'] == 'BCM' else "",
+                            acPin = formItems['int-ac-pin'],
+                            heatPin = formItems['int-heat-pin'],
+                            fanPin = formItems['int-fan-pin'],
+                            tempOffset = formItems['float-temperature-offset'],
+                            checkedWeather = 'checked' if weatherEnabled else '',
+                            apiKey = formItems['text-api-key'],
+                            latitude = formItems['float-latitude'],
+                            longitude = formItems['float-longitude'],
+                            checkedMail = 'checked' if mailEnabled else '',
+                            errorThreshold = formItems['float-error-threshold'],
+                            smtpServer = formItems['text-smtp-server'],
+                            smtpPort = formItems['int-smtp-port'],
+                            mailUsername = formItems['text-username'],
+                            mailPassword = formItems['text-password'],
+                            mailSender = formItems['text-sender'],
+                            mailRecipient = formItems['text-recipient']
+                            )
+
+@app.route('/settings')
+def settings_form():
+    global CONFIG
+    CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
+    return render_template("settings_form.html",    
+                            units = CONFIG['units'],
+                            checkedDebug = 'checked' if CONFIG['debug'] else '',
+                            unitCelsius = "selected" if CONFIG['units'] == 'C' else '',
+                            unitFarenheit = "selected" if CONFIG['units'] != 'C' else '',
+                            activeHysteresis = CONFIG['active_hysteresis'],
+                            inactiveHysteresis = CONFIG['inactive_hysteresis'],
+                            schemeBoard = "selected" if CONFIG['numbering_scheme'] != 'BCM' else "",
+                            schemeBCM = "selected" if CONFIG['numbering_scheme'] == 'BCM' else "",
+                            acPin = CONFIG['ac_pin'],
+                            heatPin = CONFIG['heater_pin'],
+                            fanPin = CONFIG['fan_pin'],
+                            tempOffset = CONFIG['temperature_offset'],
+                            checkedWeather = 'checked' if CONFIG['weather_enabled'] else '',
+                            apiKey = CONFIG['api_key'],
+                            latitude = CONFIG['latitude'],
+                            longitude = CONFIG['longitude'],
+                            checkedMail = 'checked' if CONFIG['mail_enabled'] else '',
+                            errorThreshold = CONFIG['error_threshold'],
+                            smtpServer = CONFIG['smtp_server'],
+                            smtpPort = CONFIG['smtp_port'],
+                            mailUsername = CONFIG['username'],
+                            mailPassword = CONFIG['password'],
+                            mailSender = CONFIG['sender'],
+                            mailRecipient = CONFIG['recipient']
+                            )
+
+                            
+@app.route('/forecast')
+def forecast_form():
+    alerts = getCurrentWeatherAlerts()
+    hideAlerts = 'hidden' if alerts == '<div id="weatherAlertContainer"></div>' else ''
+    forecast = getDailyWeather()
+    hideForecast = 'hidden' if not forecast else ''
+    
+    return render_template("weather.html", graph = getWeatherGraph(),
+                                                hideForecast = hideForecast,
+                                                forecast = forecast,
+                                                hideAlerts = hideAlerts,
+                                                alerts = alerts)        
+
+    
+@app.route('/_daemonLogs', methods= ['GET'])
+def updateDaemonLogs():
+    weekAgo = (datetime.now() + timedelta(days=-7)).date()
+    raw = subprocess.check_output(['journalctl', '-u', 'thermostat-daemon', '--since={0}'.format(weekAgo)])
+    head = ('<head>' + 
+                '<link href="/static/css/bootstrap.css" rel="stylesheet">' +
+                '<link href="/static/css/main.css" rel="stylesheet">' +
+            '</head>' + 
+            '<body style="padding: 20px 10px;"><div class="container">' +
+            '<h1 class="blue-letterpress">Thermostat-Daemon Logs</h1><hr style="width:100%;">' +
+            '<table class="table blue box-shadow table-striped table-bordered table-hover model-list">' +
+                '<thead>' +
+                    '<tr>' +
+                        '<th>Date</th>' +
+                        '<th>Message</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>')
+    html = ''
+    rows = raw.split('\n')[1:]
+    date = ''
+    message = ''
+    for row in rows:
+        message += row[39:].lstrip(']:').replace('>','&gt;').replace('<', '&lt;') + '<br>'
+        if date != row[:15]:
+            date = row[:15]
+            # do it this way to display in reverse order
+            if date:
+                html = '<tr><td>{date}</td><td><p>{message}</p></td></tr>'.format(date = date, message = message) + html
+                message = ''
+    html += '</tbody></table></div></body>'
+    return head + html
+
+@app.route('/_fanMode', methods= ['POST'])
+def toggleFan():
+    #verify request
+    if 'toggle' in request.form:
+        status = thermCursor.execute('SELECT * FROM status').fetchone()
+        if status['fan_mode'] == 'AUTO':
+            fanMode = 'ON'
+        else:
+            fanMode = 'AUTO'
+        
+        thermCursor.execute('DELETE FROM status')
+        thermCursor.execute('INSERT INTO status VALUES (?, ?, ?, ?)', (status['target_cool'],
+                                                                        status['target_heat'],
+                                                                        status['mode'],
+                                                                        fanMode))
+        thermConn.commit()
+        return fanMode
+    return ''
+    
+@app.route('/_currentSchedule', methods= ['GET'])
+def getCurrentSchedule():
+    return calendar.getStatusHTML()
+
+@app.route('/_liveUpdate', methods= ['GET'])
+def liveUpdate():
+    status = thermCursor.execute('SELECT * FROM status').fetchone()
+    html = '<div id="updateContainer"> \
+                <div id="fanModeContainer">{fanMode}</div> \
+                <div id="systemModeContainer">{systemMode}</div> \
+                <div id="holdTimeContainer">{holdTime}</div> \
+                <div id="indoorTempContainer">{temp}</div> \
+                <div id="whatContainer">{whatOn}</div> \
+                <div id="daemonContainer">{daemon}</div> \
+                <div id="scheduleContainer">{schedule}</div> \
+                <div id="weatherContainer">{currentWeather}</div>\
+                <div id="weatherAlerts">{alerts}</div> \
+                <div id="timeContainer">{time}</div> \
+            </div>'.format( fanMode = status['fan_mode'],
+                            systemMode = status['mode'],
+                            holdTime = calendar.getRemainingHoldTime(),
+                            temp = str(round(getIndoorTemp(CONFIG['units'], CONFIG['temperature_offset']),1)),
+                            whatOn = getWhatsOn(),
+                            daemon = getDaemonStatus(),
+                            schedule = calendar.getStatusHTML() if status['mode'] == 'AUTO' else '',
+                            currentWeather = getCurrentWeather(),
+                            alerts = getCurrentWeatherAlerts(),
+                            time = datetime.now().strftime('<b>%I:%M</b><small>%p %A, %B %d</small>')
+                            )
+    return html
+
+@app.route('/_reloadConfig', methods = ['POST'])
+def reloadDaemonConfig():
+    reloadDaemon()
+    return 'daemon has been reloaded'
+    
+
+
+if __name__ == "__main__":
+    app.run("0.0.0.0", port=80, debug=True)

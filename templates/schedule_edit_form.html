@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<head>
+    <meta text/html;charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+    <script type='application/javascript' src="/static/jquery.min.js"></script>
+    <script type='application/javascript' src="/static/bootstrap-datetimepicker.min.js"></script>
+    <script type='application/javascript' src="/static/fastclick.js"></script>
+    <script type='application/javascript' src="/static/increment.js"></script>
+    <script type='application/javascript' src="/static/bootstrap.min.js"></script>
+</head>
+<script>
+    $(function() {
+        var selectBox = $("[name='timeFrame']")
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+
+        var current_date = d.getFullYear() + '/' +
+            ((''+month).length<2 ? '0' : '') + month + '/' +
+            ((''+day).length<2 ? '0' : '') + day;
+        //initialize
+        
+        if(selectBox.val() == 'DATE') {
+            $("[name='date']").val(current_date);
+            $('#date-row').show();
+        } else {
+            $("[name='date']").val(selectBox.val());
+            $('#date-row').hide(); 
+        }
+        
+        //selection change
+        $("[name='timeFrame']").change(function(){
+            if(selectBox.val() == 'DATE') {
+                $("[name='date']").val(current_date);
+                $('#date-row').show(); 
+            } else {
+                $("[name='date']").val(selectBox.val());
+                $('#date-row').hide(); 
+            } 
+        });
+    });
+
+</script>
+
+
+
+<body class="schedule edit" style="padding-top: 25px;">
+
+    <center>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissable fixed-bottom">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+              {{ message }}
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </center>
+
+    <form action="{{ url_for('schedule_edit') }}" method="POST">
+        <input type="hidden" name="id" value="{{ entry.id }}" />
+        <table style="width: 500px; text-align: right;">
+            <tbody>
+                <tr>
+                    <td><h1 class="blue-letterpress">When</h1></td>
+                    <td>
+                        <div class="styled-select blue semi-square" style="margin: 0 auto; text-align: center;">
+                                <select class="styled-select blue semi-square" name="timeFrame">
+                                    {% for option in ['DATE', 'MONDAYS', 'TUESDAYS', 'WEDNESDAYS', 'THURSDAYS', 'FRIDAYS', 'SATURDAYS', 'SUNDAYS', 'WEEKDAYS', 'WEEKENDS', 'ALWAYS'] %}
+                                        <option value="{{ option }}" {% if option is equalto entry.date %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                    </select>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr id="date-row">
+                    <td><h1 class="blue-letterpress">Date</h1></td>
+                    <td>
+                        <div id="datepicker" class="input-append date">
+                          <input class="box-letterpress blue-letterpress" type="text" name="date" onClick="this.select();" ></input>
+                          <span class="add-on">
+                            <i class="fa fa-pencil glyphicon glyphicon-calendar blue-letterpress"></i>
+                          </span>
+                        </div>
+                    </td>
+                </tr>
+                
+        
+                <tr>
+                    <td><h1 class="blue-letterpress">Time On</h1></td>
+                    <td>
+                        <div id="time-on" class="input-append date">
+                          <input class="box-letterpress blue-letterpress" type="text" name="time_on" value="{{ entry.time_on }}"></input>
+                          <span class="add-on">
+                            <i class="fa fa-pencil glyphicon glyphicon-time blue-letterpress"></i>
+                          </span>
+                        </div>
+                    </td>
+                </tr>
+        
+                <tr>
+                    <td><h1 class="blue-letterpress">Time Off</h1></td>
+                    <td>
+                        <div id="time-off" class="input-append date">
+                          <input class="box-letterpress blue-letterpress" type="text" name="time_off" value="{{ entry.time_off }}"></input>
+                          <span class="add-on">
+                            <i class="fa fa-pencil glyphicon glyphicon-time blue-letterpress"></i>
+                          </span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <script type="text/javascript">
+          $('#datepicker').datetimepicker({
+            format: 'yyyy/MM/dd',
+            pickTime: false, 
+            language: 'en',
+          });
+          
+          $('#time-on').datetimepicker({
+            format: 'HH:mm PP',
+            pickDate: false, 
+            language: 'en',
+            pick12HourFormat: true,   // enables the 12-hour format time picker
+            pickSeconds: false
+          });
+          
+          $('#time-off').datetimepicker({
+            format: 'HH:mm PP',
+            pickDate: false, 
+            language: 'en',
+            pick12HourFormat: true,   // enables the 12-hour format time picker
+            pickSeconds: false
+          });
+        </script>
+    
+    
+    
+    
+        <div id="row5" class="blue-inset-box">
+            <div>
+                <table>
+                    <tr>
+                        <td><input class="round-letterpress blue-letterpress" type="number" id="target_heat" name="target_heat" value={{ entry.target_heat }} onClick="this.select();" ></td>
+                        <td><input class="round-letterpress blue-letterpress" type="number" id="target_cool" name="target_cool" value={{ entry.target_cool }} onClick="this.select();" ></td>
+                    </tr>
+                    <tr class="blue-letterpress" style="font-size: 35px;line-height: 20px;">
+                        <td>Target Heat</td>
+                        <td>Target Cool</td>
+                    </tr>
+                </table>
+                <br>
+            </div>
+        </div>
+
+        <div id="row6" style="margin-top:-15px;">
+            <ul class="round-nav" style="padding:0;">
+                <li>
+                  <a href="#" onclick="$(this).closest('form').submit()">
+                    <span class="btn-icon-save blue-letterpress"></span>
+                    <span class="screen-reader-text">Home</span>
+                  </a>
+                </li>
+            </ul>
+        </div>
+    </form>
+</body>
+
+
+
+    

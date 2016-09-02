@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<meta text/html;charset="utf-8">
+
+<!-- Bootstrap core CSS -->
+<link href="/static/css/jquery.mobile-1.4.5.css" rel="stylesheet">
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+<link href="/static/css/main.css" rel="stylesheet">
+<link href="/static/css/lame.css" rel="stylesheet">
+
+<script type='application/javascript' src="{{url_for('static',filename='fastclick.js')}}"></script>
+<!-- jquery is kinda overkill, but I doubt anyone besides me will actually use this... -->
+<script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+<script src="{{url_for('static',filename='jquery.mobile-1.4.5.min.js')}}"></script>
+
+<script src="{{url_for('static',filename='svg.jquery.js')}}"></script>
+<script src="{{url_for('static',filename='pygal-tooltips.js')}}"></script>
+<script>window.jQuery || document.write('<script src="{{
+  url_for('static', filename='jquery.js') }}">\x3C/script>')
+</script>
+
+<script type="application/javascript">
+// popup examples
+$( document ).on( "pagecreate", function() {
+    // The window width and height are decreased by 30 to take the tolerance of 15 pixels at each side into account
+    function scale( width, height, padding, border ) {
+        var scrWidth = $( window ).width() - 30,
+            scrHeight = $( window ).height() - 30,
+            ifrPadding = 2 * padding,
+            ifrBorder = 2 * border,
+            ifrWidth = width + ifrPadding + ifrBorder,
+            ifrHeight = height + ifrPadding + ifrBorder,
+            h, w;
+        if ( ifrWidth < scrWidth && ifrHeight < scrHeight ) {
+            w = ifrWidth;
+            h = ifrHeight;
+        } else if ( ( ifrWidth / scrWidth ) > ( ifrHeight / scrHeight ) ) {
+            w = scrWidth;
+            h = ( scrWidth / ifrWidth ) * ifrHeight;
+        } else {
+            h = scrHeight;
+            w = ( scrHeight / ifrHeight ) * ifrWidth;
+        }
+        return {
+            'width': w - ( ifrPadding + ifrBorder ),
+            'height': h - ( ifrPadding + ifrBorder )
+        };
+    };
+    $( ".ui-popup iframe" )
+        .attr( "width", 0 )
+        .attr( "height", "auto" );
+    $( "#popupPanel iframe" ).contents().find( "#map_canvas" )
+        .css( { "width" : 0, "height" : 0 } );
+    $( "#popupPanel" ).on({
+        popupbeforeposition: function() {
+            var size = scale( 800, 600, 0, 1 ),
+                w = size.width,
+                h = size.height;
+            $( "#popupPanel iframe" )
+                .attr( "width", w )
+                .attr( "height", h );
+            $( "#popupPanel iframe" ).contents().find( "#map_canvas" )
+                .css( { "width": w, "height" : h } );
+        },
+        popupafterclose: function() {
+            $( "#popupPanel iframe" )
+                .attr( "width", 0 )
+                .attr( "height", 0 );
+            $( "#popupPanel iframe" ).contents().find( "#map_canvas" )
+                .css( { "width": 0, "height" : 0 } );
+        }
+    });
+});
+</script>
+<!-- This will update the current indoor temp as fed from getIndoorTemp.py
+	 Refreshes every 5 seconds -->
+<script>
+function updateTemp() {
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_liveTemp",
+    success : function(result){
+        $('#indoorTempDiv').html(result);
+    }
+})
+};
+window.setInterval(function(){
+  updateTemp()
+}, 5000);
+</script>
+
+<script>
+function updateWhatsOn() {
+
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_liveWhatsOn",
+    success : function(result){
+        $('#whatsOnSpan').html(result);
+    }
+})
+};
+
+window.setInterval(function(){
+  updateWhatsOn()
+}, 10000);
+</script>
+
+<script>
+function updateDaemonStatus() {
+
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_liveDaemonStatus",
+    success : function(result){
+        $('#daemonStatusSpan').html(result);
+    }
+})
+};
+
+window.setInterval(function(){
+  updateDaemonStatus()
+}, 30000);
+</script>
+
+<script>
+function updateWhatsOn() {
+
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	$.ajax({
+    url : $SCRIPT_ROOT + "/_currentSchedule",
+    success : function(result){
+        $('#currentScheduleSpan').html(result);
+    }
+})
+};
+
+window.setInterval(function(){
+  updateWhatsOn()
+}, 10000);
+</script>
+
+
+<script type="application/javascript">
+	window.addEventListener('load', function() {
+		var plus, minus;
+
+		plus = document.getElementById('plus');
+		minus = document.getElementById('minus');
+
+		// Android 2.2 needs FastClick to be instantiated before the other listeners so that the stopImmediatePropagation hack can work.
+		FastClick.attach(minus);
+		FastClick.attach(plus);
+
+		plus.addEventListener('click', function(event) {
+			increment(document.getElementById('target'))
+		}, false);
+
+		minus.addEventListener('click', function(event) {
+			decrement(document.getElementById('target'))
+		}, false);
+	}, false);
+</script>
+
+<!-- Makes them fancy buttons go -->
+<script type=text/javascript src="{{
+  url_for('static', filename='increment.js') }}"></script>
+
+<body onload="updateTemp(); updateWhatsOn(); updateDaemonStatus();">
+    
+    <div data-role="popup" id="popupPanel" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
+    <a href="#" data-rel="back" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
+    <iframe src="/admin/schedule" width="480" height="320" seamless=""></iframe>
+    </div>
+
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav pager">
+            <li class="modern embossed-link"><a href="/fan"><img src="static/images/fan.png">Fan</a></li>
+            <li class="modern embossed-link"><a href="/system"><img src="static/images/system.png">System</a></li>
+            <li class="modern embossed-link"><a href="#popupPanel" data-rel="popup" data-position-to="window"><img src="static/images/schedule.png">Schedule</a></li>
+            <li class="modern embossed-link"><a href="/hold"><img src="static/images/hold.png">Hold</a></li>
+            <li class="modern embossed-link"><a href="/settings"><img src="static/images/settings.png">Settings</a></li>
+            <li class="modern embossed-link"><a href="/"><img src="static/images/home.png">Home</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+<div id="header">
+<center>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+</center>
+
+<div id="container2">
+	<form action="." method="POST">
+	<div id="container1">
+		<div id="col1">
+			<center>
+			<br><br>
+			<div class="onoffswitch">
+				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{ checked }}>
+				<label class="onoffswitch-label" for="myonoffswitch">
+						<div class="onoffswitch-inner"></div>
+						<div class="onoffswitch-switch"></div>
+				</label>
+			</div> 
+			<div class="plus" id="plus">+</div>
+			<input type="text" id="target" name="target" value={{ targetTemp }}>
+			<div class="minus" id="minus">-</div>
+			<br><br>
+
+		    </center>
+		</div>
+
+		<div id="col2">
+			<center>
+			<!-- the heating / cooling switch -->
+			<div class="switch">
+				<center>
+				{{weatherString|safe}} 
+				<br>
+				<!-- center tags are basically the extent of my web design knowledge. -->
+				<!-- updated by the updateTemp() js function defined above -->
+				Current indoor temp: 
+				<p id="currentTemp"><span id="indoorTempDiv"></span>&deg;</p>
+				Current target temp:
+				<br>
+				<p id="targetTemp">{{targetTemp}}&deg;</p>
+				<br><br>
+				<input type="submit" style="height: 150px; width: 150px" id="goButton" class="goButton" value="Go!">
+				<br>
+                <spad id="currentScheduleSpan"></span>
+				<span id="daemonStatusSpan"></span>
+				<span id="whatsOnSpan"></span>
+				</center>
+			</div>
+			</center>
+		</div>
+	</div>
+	</form>

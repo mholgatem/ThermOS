@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<head>
+    <meta text/html;charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <script type='application/javascript' src="/static/fastclick.js"></script>
+    <script type='application/javascript' src="/static/increment.js"></script>
+    <script type='application/javascript' src="/static/jquery.min.js"></script>
+    <script type='application/javascript' src="/static/bootstrap.min.js"></script>
+
+    <script type="application/javascript">
+        window.addEventListener('load', function() {
+            var plus, minus;
+
+            plus = document.getElementById('plus');
+            minus = document.getElementById('minus');
+
+            // Android 2.2 needs FastClick to be instantiated before the other listeners so that the stopImmediatePropagation hack can work.
+            FastClick.attach(minus);
+            FastClick.attach(plus);
+
+            plus.addEventListener('click', function(event) {
+                increment(document.getElementById('target'))
+            }, false);
+
+            minus.addEventListener('click', function(event) {
+                decrement(document.getElementById('target'))
+            }, false);
+        }, false);
+    </script>
+</head>
+<body class="hold">
+
+    <center>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissable fixed-bottom">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+              {{ message }}
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </center>
+
+    <form action="{{ url_for('hold_submit') }}" method="POST">
+        <div id="row1">
+            <div>
+
+                <div style="margin: 0 auto; text-align: center; display: inline-flex; justify-content: center; align-items: center;">
+                    <div class="box-letterpress blue-letterpress holdTempContainer">
+                        <input class="blue-letterpress" type="number" id="target" name="target" value={{ targetTemp }} onClick="this.select();" >
+                        <div class="plusminusContainer">
+                            <div class="box-letterpress blue-letterpress plusminus" id="plus">+</div>
+                            <div class="box-letterpress blue-letterpress plusminus" id="minus">-</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{ checked }}>
+                            <label class="onoffswitch-label" for="myonoffswitch">
+                                    <div class="onoffswitch-inner"></div>
+                                    <div class="onoffswitch-switch"></div>
+                            </label>
+                        </div>
+                        <div class="styled-select blue semi-square" style="margin: 0 auto; text-align: center;">
+                                <select class="styled-select blue semi-square" name="timeFrame">
+                                  <option value="OFF">Disable Hold</option>
+                                  <option value="0.25">15 Minutes</option>
+                                  <option value="0.5">30 Minutes</option>
+                                  <option value="1">1 Hour</option>
+                                  <option value="1.5">1.5 Hours</option>
+                                  <option value="2">2 Hours</option>
+                                  <option value="3">3 Hours</option>
+                                  <option value="4">4 Hours</option>
+                                  <option value="8">8 Hours</option>
+                                  <option value="12">12 Hours</option>
+                                  <option value="24">24 Hours</option>
+                                  <option value="FOREVER">Forever</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+                <br>
+            </div>
+        </div>
+
+        <div id="row2">
+            <div>
+                <!-- center tags are basically the extent of my web design knowledge. -->
+                <!-- updated by the updateTemp() js function defined above -->
+                
+                <br>
+
+                <ul class="round-nav" style="padding:0;">
+                    <li>
+                      <a href="#" onclick="$(this).closest('form').submit()">
+                        <span class="btn-icon-set blue-letterpress"></span>
+                        <span class="screen-reader-text">Home</span>
+                      </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </form>
+</body>
+
+
+
+
+    

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<head>
+    <meta text/html;charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <script src="/static/jquery.min.js" type="text/javascript"></script>
+    <script src="/static/svg.jquery.js" type="text/javascript"></script>
+</head>
+
+
+<body class="weather" style="display: inline-block; width: 100%">
+    <div class="container">
+        <h1 class="blue-letterpress">Local Forecast</h1>
+        <hr style="width:100%;">
+        <h3 class="blue-letterpress">Hourly Temperature</h3>
+        <div class="blue-inset-box" style="height:250px; overflow: hidden;">
+            <div class="dragscroll" style="
+                width: 100%;
+                height: 300px;
+                overflow-x: auto;
+                margin: auto;
+                overflow-y: hidden;">
+            {{ graph | safe }}
+            </div>
+        </div>
+        <h3 class="blue-letterpress" {{ hideForecast }}>7 Day Forecast</h3>
+        <div class="blue-inset-box" style="overflow: hidden;height:470px;" {{ hideForecast }}>
+            <div class="dragscroll" style="width: 100%; overflow-x: auto; margin: auto; overflow-y: hidden;">
+                <table id="forecast">
+                    <div class="table-crease"></div>
+                    <thead>
+                        <tr>
+                            <th class="sticky-col blue-letterpress" style="padding: 13px 0 0 10px;
+                                                                            box-shadow: inset 0px -20px 20px -20px;">Day</th>
+                            <th style="display:inline-block; width:150px"></th>
+                            <th class="blue-letterpress">Summary</th>
+                            <th class="blue-letterpress">Low</th>
+                            <th class="blue-letterpress">High</th>
+                            <th class="blue-letterpress">Sunrise</th>
+                            <th class="blue-letterpress">Sunset</th>
+                            <th class="blue-letterpress">Moon</th>
+                            <th class="blue-letterpress">Precip</th>
+                            <th class="blue-letterpress">Wind</th>
+                            <th class="blue-letterpress">Humidity</th>
+                            <th class="blue-letterpress">Ozone</th>
+                            <th class="blue-letterpress">Pressure</th>
+                            <th class="blue-letterpress">Cloud Cover</th>
+                            <th class="blue-letterpress">Visibility</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for day in forecast %}
+                        <tr>
+                            <td class="sticky-col">
+                                <div>
+                                    <span>{{ day.weekday }}</span>
+                                    <span>{{ day.date }}</span>
+                                </div>
+                                <img class="forecast-icon" src="/static/images/weather/icons/32/{{ day.icon }}.png">
+                            </td>
+                            <td style="display:inline-block; width:150px"></td>
+                            <td>{{ day.summary }}</td>
+                            <td>{{ day.tempMin }}&deg;<span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="{{ day.tempMinTime }}"></td>
+                            <td>{{ day.tempMax }}&deg;<span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="{{ day.tempMaxTime }}"></td>
+                            <td>{{ day.sunriseTime }}</td>
+                            <td>{{ day.sunsetTime }}</td>
+                            <td><span class="moon-phase outer"><span class="moon-phase inner" style="margin-right:{{ day.moonPhase }}"></span></span></td>
+                            <td>{{ day.precipProbability }}</td>
+                            <td><span style="float:left">{{ day.windBearing }}</span><span style="float:left;">&nbsp;-&nbsp;<span><span style="float:right">{{ day.windSpeed }} mph</span></td>
+                            <td>{{ day.humidity }}</td>
+                            <td>{{ day.ozone }}</td>
+                            <td>{{ day.pressure }}</td>
+                            <td>{{ day.cloudCover }}</td>
+                            <td>{{ day.visibility }}</td>
+                            
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <h3 class="blue-letterpress"  {{ hideAlerts }}>Local Alerts</h3>
+        <div class="blue-inset-box" {{ hideAlerts }}>
+            {{ alerts | safe}}
+        </div>
+    </div>
+</body>
+
+<script>
+/*pygal.init($('#svg-fi gsvg').get(0))*/
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['exports'], factory);
+    } else if (typeof exports !== 'undefined') {
+        factory(exports);
+    } else {
+        factory((root.dragscroll = {}));
+    }
+}(this, function (exports) {
+    var _window = window;
+    var _document = document;
+    var mousemove = 'mousemove';
+    var mouseup = 'mouseup';
+    var mousedown = 'mousedown';
+    var EventListener = 'EventListener';
+    var addEventListener = 'add'+EventListener;
+    var removeEventListener = 'remove'+EventListener;
+
+    var dragged = [];
+    var reset = function(i, el) {
+        for (i = 0; i < dragged.length;) {
+            el = dragged[i++];
+            el = el.container || el;
+            el[removeEventListener](mousedown, el.md, 0);
+            _window[removeEventListener](mouseup, el.mu, 0);
+            _window[removeEventListener](mousemove, el.mm, 0);
+        }
+
+        // cloning into array since HTMLCollection is updated dynamically
+        dragged = [].slice.call(_document.getElementsByClassName('dragscroll'));
+        for (i = 0; i < dragged.length;) {
+            (function(el, lastClientX, lastClientY, pushed, scroller, cont){
+                (cont = el.container || el)[addEventListener](
+                    mousedown,
+                    cont.md = function(e) {
+                        if (!el.hasAttribute('nochilddrag') ||
+                            _document.elementFromPoint(
+                                e.pageX, e.pageY
+                            ) == cont
+                        ) {
+                            pushed = 1;
+                            lastClientX = e.clientX;
+                            lastClientY = e.clientY;
+
+                            e.preventDefault();
+                        }
+                    }, 0
+                );
+
+                _window[addEventListener](
+                    mouseup, cont.mu = function() {pushed = 0;}, 0
+                );
+
+                _window[addEventListener](
+                    mousemove,
+                    cont.mm = function(e) {
+                        if (pushed) {
+                             (scroller = el.scroller||el).scrollLeft -=
+                                 (- lastClientX + (lastClientX=e.clientX));
+                             scroller.scrollTop -=
+                                 (- lastClientY + (lastClientY=e.clientY));
+                        }
+                    }, 0
+                );
+             })(dragged[i++]);
+        }
+    }
+
+      
+    if (_document.readyState == 'complete') {
+        reset();
+    } else {
+        _window[addEventListener]('load', reset, 0);
+    }
+
+    exports.reset = reset;
+}));
+</script>
+
+    

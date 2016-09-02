@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<head>
+    <meta text/html;charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <script type='application/javascript' src="/static/jquery.min.js"></script>
+    <script type='application/javascript' src="/static/bootstrap.min.js"></script>
+</head>
+
+<body class="settings">
+    <center style="position: absolute;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissable" style="max-width: 450px;">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+              {{ message }}
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    </center>
+
+    <form action="{{ url_for('settings_submit') }}" method="POST" id="settings-form">
+        <div style="padding-right: 10px; border-bottom: 4px solid rgb(69, 111, 146);">
+            <span><h2>Thermostat Settings</h2></span>
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Thermostat-daemon service will output extra logs and error information">
+                <label>Debug Enabled:</label>
+                <div class="onoffswitch" id="setting-option-debug">
+                    <input type="checkbox" name="bool-debug" class="onoffswitch-checkbox" id="debugswitch" {{ checkedDebug }}>
+                    <label class="onoffswitch-label" for="debugswitch">
+                            <div class="onoffswitch-inner true-false"></div>
+                            <div class="onoffswitch-switch"></div>
+                    </label>
+                </div>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Units to use to display temperature data">
+                <label>Temperature Units:</label>
+                <div class="styled-select blue semi-square" style="margin: 0 auto; text-align: center;">
+                    <select class="styled-select blue semi-square" name="option-temperature-units">
+                      <option value="C" {{ unitCelsius }}>&deg;Celsius</option>
+                      <option value="F" {{ unitFarenheit }}>&deg;Farenheit</option>
+                    </select>
+                </div>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="heat or cool &deg;{{ units }} past set temperature">
+                <label>Active Hysteresis:</label>
+                <input class="blue-letterpress" type="text" id="setting-active-hysteresis" name="float-active-hysteresis" value={{ activeHysteresis }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Turn system off until room warms or cools &deg;{{ units }} past set temperature">
+                <label>Inactive Hysteresis:</label>
+                <input class="blue-letterpress" type="text" id="setting-inactive-hysteresis" name="float-inactive-hysteresis" value={{ inactiveHysteresis }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Adjust thermostat sensor by this amount">
+                <label>Temperature Offset:</label>
+                <input class="blue-letterpress" type="text" id="setting-f-offset" name="float-temperature-offset" value={{ tempOffset }}>
+            </span>
+            
+            <span><h2>GPIO Settings</h2></span>
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="The identification scheme for the GPIO pins">
+                <label>Numbering Scheme:</label>
+                <div class="styled-select blue semi-square" style="margin: 0 auto; text-align: center;">
+                    <select class="styled-select blue semi-square" name="option-numbering-scheme">
+                      <option value="BOARD" {{ schemeBoard }}>BOARD</option>
+                      <option value="BCM" {{ schemeBCM }}>BCM</option>
+                    </select>
+                </div>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Pin that activates your AC">
+                <label>AC Pin:</label>
+                <input class="blue-letterpress" type="text" id="setting-ac-pin" name="int-ac-pin" value={{ acPin }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Pin that activates your Heater">
+                <label>Heater Pin:</label>
+                <input class="blue-letterpress" type="text" id="setting-heat-pin" name="int-heat-pin" value={{ heatPin }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Pin that activates your Fan">
+                <label>Fan Pin:</label>
+                <input class="blue-letterpress" type="text" id="setting-fan-pin" name="int-fan-pin" value={{ fanPin }}>
+            </span>
+            
+            
+            <span><h2>Weather Settings</h2></span>
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Sign up for API key at https://developer.forecast.io/">
+                <label>Weather Enabled:</label>
+                <div class="onoffswitch" id="setting-option-weather">
+                    <input type="checkbox" name="bool-weather" class="onoffswitch-checkbox" id="weatherswitch" {{ checkedWeather }}>
+                    <label class="onoffswitch-label" for="weatherswitch">
+                            <div class="onoffswitch-inner true-false"></div>
+                            <div class="onoffswitch-switch"></div>
+                    </label>
+                </div>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Sign up for API key at https://developer.forecast.io/">
+                <label>Forecast.io API Key:</label>
+                <input class="blue-letterpress" type="text" id="setting-api-key" name="text-api-key" value={{ apiKey }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="(maps.google.com) Right-click location -select-> what's here?">
+                <label>Latitude:</label>
+                <input class="blue-letterpress" type="text" id="setting-latitude" name="float-latitude" value={{ latitude }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="(maps.google.com) Right-click location -select-> what's here?">
+                <label>Longitude:</label>
+                <input class="blue-letterpress" type="text" id="setting-longitude" name="float-longitude" value={{ longitude }}>
+            </span>
+            
+            <span><h2>Mail Settings</h2></span>
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Send email when something goes wrong">
+                <label>Mail Enabled:</label>
+                <div class="onoffswitch" id="setting-option-mail">
+                    <input type="checkbox" name="bool-mail" class="onoffswitch-checkbox" id="mailswitch" {{ checkedMail }}>
+                    <label class="onoffswitch-label" for="mailswitch">
+                            <div class="onoffswitch-inner true-false"></div>
+                            <div class="onoffswitch-switch"></div>
+                    </label>
+                </div>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Send email if temp gets this far away from target temp">
+                <label>Error Threshold:</label>
+                <input class="blue-letterpress" type="text" id="setting-error-threshold" name="float-error-threshold" value={{ errorThreshold }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="The SMTP server of your choice (e.g. - smtp.gmail.com)">
+                <label>SMTP Server:</label>
+                <input class="blue-letterpress" type="text" id="setting-smtp-server" name="text-smtp-server" value={{ smtpServer }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="SMTP port number (e.g. - 587)">
+                <label>SMTP Port:</label>
+                <input class="blue-letterpress" type="text" id="setting-smtp-port" name="int-smtp-port" value={{ smtpPort }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Username for sender account">
+                <label>Username:</label>
+                <input class="blue-letterpress" type="text" id="setting-username" name="text-username" value={{ mailUsername }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Password for sender account">
+                <label>Password:</label>
+                <input class="blue-letterpress" type="password" id="setting-password" name="text-password" value={{ mailPassword }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Sender email address (faking this may get you flagged by spam filters)">
+                <label>Sender:</label>
+                <input class="blue-letterpress" type="text" id="setting-sender" name="text-sender" value={{ mailSender }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Recipient email or sms address">
+                <label>Recipient:</label>
+                <input class="blue-letterpress" type="text" id="setting-recipient" name="text-recipient" value={{ mailRecipient }}>
+            </span>
+        </div>
+        <div style="border-top: 1px solid white;">
+            <span>
+                <ul class="round-nav" style="padding:0;">
+                    <li>
+                      <a href="#" onclick="$(this).closest('form').submit()">
+                        <span class="btn-icon-save blue-letterpress"></span>
+                        <span class="screen-reader-text">Save</span>
+                      </a>
+                    </li>
+                </ul>
+            </span>
+        </div>
+        
+    </form>
+
+    
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+</body>
+</html>

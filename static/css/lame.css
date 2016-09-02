@@ -1,0 +1,243 @@
+/* switch thanks to this fancy generator: http://proto.io/freebies/onoff/ */
+/* <!-- */
+body {
+    margin:0;
+    padding:0;
+}
+#header h1,
+#header h2,
+#header p {
+    margin-left:2%;
+    padding-right:2%;
+}
+#active2 #tab2,
+#active3 #tab3,
+#active4 #tab4,
+#active5 #tab5 {
+    font-weight:bold;
+    text-decoration:none;
+    color:#000;
+}
+#footer {
+    clear:both;
+    float:left;
+    width:100%;
+}
+#footer p {
+    margin-left:2%;
+    padding-right:2%;
+}
+
+/* Start of Column CSS */
+#container2 {
+    clear:left;
+    float:left;
+    width:50%;
+    background: url(../images/info_box_small.png) no-repeat center;
+}
+#container1 {
+    float:left;
+    width:50%;
+    margin: 12% 0;
+    padding: 10px;
+}
+#container1 > div{
+    background: url(../images/info_box_big.png) no-repeat center;
+    background-size: 100% 100%;
+    width: 100%;
+    height: 100%;
+}
+#col1 {
+    float:left;
+    width:46%;
+    position:relative;
+    left:52%;
+    overflow:hidden;
+}
+#col2 {
+    float:left;
+    width:46%;
+    position:relative;
+    left:56%;
+    overflow:hidden;
+}
+#row1 {
+    float:left;
+    width:100%;
+    position:relative;
+    left:50%;
+    overflow:hidden;
+}
+#row2 {
+    float:left;
+    width:100%;
+    position:relative;
+    left:50%;
+    overflow:hidden;
+}
+/* --> */
+
+.plusminus{
+    width: 1em;
+    height: 1em;
+    font-size: 100px;
+    text-align: center;
+    line-height: .85em;
+}
+
+.plusminus#minus { line-height: .75em; }
+
+li {
+    list-style: none;
+    font-size: 24px;
+}
+.goButton {
+    font-size: 64pt;
+    width: 200px;
+    text-align: center
+}
+input[type="text"] {
+    font-size: 64pt;
+    width: 200px;
+    text-align: center
+}
+p#currentTemp {
+    font-size: 64pt;
+    margin: 0px;
+}
+p#targetTemp {
+    font-size: 64pt;
+    margin: 0px;
+}
+p#daemonRunning{
+    font-size: 16pt;
+    color:#1BB300;
+    font-weight:bold;
+}
+p#daemonNotRunning{
+    font-size: 64pt;
+    color:#FF0000;
+    font-weight:1500;
+}
+p#cool{
+    color:#2FCCFF;
+    font-size: 12pt;
+}
+p#heat{
+    color:#FF0000;
+    font-size: 12pt;
+
+}
+p#fan{
+    color:#00CC00;
+    font-size: 12pt;
+}
+p#coolOn{
+    color:#2FCCFF;
+    font-size: 24pt;
+    font-weight:bold;
+}
+p#heatOn{
+    color:#FF0000;
+    font-size: 24pt;
+    font-weight:bold;
+}
+p#fanOn{
+    color:#00CC00;
+    font-size: 24pt;
+    font-weight:bold;
+}
+/*the crazy switch bit*/
+
+.onoffswitch {
+    position: relative; width: 200px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+    margin: 0 auto;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 25px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 70px; padding: 0; line-height: 70px;
+    font-size: 32px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "Cool";
+    padding-left: 10px;
+    background-color: #34A7C1; color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+    content: "Heat";
+    padding-right: 10px;
+    background-color: #FF9100; color: #FFFFFF;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 55px; margin: 7.5px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 126px;
+    border: 2px solid #999999; border-radius: 25px;
+    transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+}
+
+
+/* select box */
+
+.styled-select {
+   background: url(/static/images/select_box_arrow.png) no-repeat 96% 0;
+   height: 58px;
+   overflow: hidden !important;
+   width: 300px;
+}
+
+.styled-select select {
+   background: transparent;
+   border: none;
+   font-size: 14px;
+   height: 58px;
+   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+   width: 328px;
+}
+
+.semi-square {
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+
+.blue{ background-color: #3b8ec2; }
+.blue option{
+     background-color: #3b8ec2; 
+}
+
+.blue select{ 
+    color: #fff;
+    font-size: 30px;
+}
+
+/* LETTERPRESS */
+
+h2{
+    font: 55px Tahoma, Helvetica, Arial, Sans-Serif;
+}
+
+.blue-letterpress{
+    color: rgb(34, 84, 125);
+    text-shadow: 0px 2px 3px #4598dc;
+}
