@@ -1,0 +1,12 @@
+[Unit]
+Description=Thermostat-web
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/ThermOS
+ExecStart=/usr/bin/python thermostat_web.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

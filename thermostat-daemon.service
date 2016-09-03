@@ -1,0 +1,15 @@
+[Unit]
+Description=ThermOS-daemon
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/ThermOS
+ExecStart=/usr/bin/python -u thermostat_daemon.py
+Restart=always
+RestartSec=360
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+
