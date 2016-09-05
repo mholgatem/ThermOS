@@ -28,8 +28,8 @@ echo
 echo "Installing Dependencies..."
 echo
 
-sudo apt-get -y install python-pip python-dev python-pygal sqlite3
-sudo pip install flask python-forecastio
+sudo apt-get -y install python-pip python-dev sqlite3
+sudo pip install flask pygal python-forecastio
 
 #copy service unit files for systemctl
 daemon=$SCRIPTPATH"/thermostat-daemon.service"
