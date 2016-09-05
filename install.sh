@@ -29,7 +29,7 @@ echo "Installing Dependencies..."
 echo
 
 sudo apt-get -y install python-pip python-dev python-pygal sqlite3
-sudo pip install flask flask-sqlalchemy flask-admin python-forecastio
+sudo pip install flask python-forecastio
 
 #copy service unit files for systemctl
 daemon=$SCRIPTPATH"/thermostat-daemon.service"
@@ -42,8 +42,10 @@ sudo systemctl daemon-reload
 sudo systemctl start thermostat-daemon
 sudo systemctl start thermostat-web
 
+echo
+echo
 echo "-----------------"
 echo -e "${CYAN}Installation Complete!${NONE}"
 echo -e "${CYAN}Type your Pi's IP address into a web browser to access your control panel${NONE}"
-echo -e "                    ${FUSCHIA}${UNDERLINE}"$IP"${NONE}"
+echo -e "${FUSCHIA}${UNDERLINE}"$IP"${NONE}"
 echo "-----------------"
