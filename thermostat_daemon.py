@@ -388,7 +388,8 @@ class ThermOSDaemon(object):
         if not self.status:
             return 'OFF'
         else:
-            if self.status['mode'] == 'AUTO':
+            if (self.status['mode'] == 'AUTO' or 
+                self.schedule['target_heat'] == 'HOLD' or self.schedule['target_cool'] == 'HOLD'):
                 if self.schedule['systemOn']:
                     # AUTO COOL
                     if type(self.schedule['target_cool']) in [int, float] :
@@ -440,7 +441,7 @@ class ThermOSDaemon(object):
 
             if not self.inPassiveMode:
                 if self.thermostatMode == "COOL": self.cool()
-                if self.thermostatMode == "HEAT": self.Heat()
+                if self.thermostatMode == "HEAT": self.heat()
 
                 if (self.thermostatMode == "OFF" or
                     self.thermostatMode == "COOL" and self.indoorTemp <= self.activeTarget or

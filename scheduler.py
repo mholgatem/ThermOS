@@ -166,9 +166,9 @@ class Calendar(object):
         systemStatus = {"systemOn": False, 
                             "on": "", 
                             "off": "", 
-                            "title": "No Schedule entries", 
-                            "target_heat": "N/A", 
-                            "target_cool": "N/A"}
+                            "title": "Nothing scheduled for the next 72 hours", 
+                            "target_heat": "OFF", 
+                            "target_cool": "OFF"}
         for day in self.timeline:
             for entry in day:
                 if entry["on"] <= now < entry["off"] and (entry["weight"] > currentWeight):

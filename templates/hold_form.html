@@ -31,14 +31,62 @@
             }, false);
         }, false);
     </script>
+    <script>
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+    
+    $(function() {
+        var selectBox = $("[name='timeFrame']")
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+
+        var current_date = d.getFullYear() + '/' +
+            ((''+month).length<2 ? '0' : '') + month + '/' +
+            ((''+day).length<2 ? '0' : '') + day;
+            
+        if(getParameterByName('date')){
+            current_date = getParameterByName('date');
+        }
+        
+        //initialize
+        if(selectBox.val() != 'OFF') {
+            $('.holdTempContainer').show(); 
+            $('.onoffswitch').show(); 
+        } else {
+            $('.holdTempContainer').hide(); 
+            $('.onoffswitch').hide();  
+        }
+        
+        //selection change
+        $("[name='timeFrame']").change(function(){
+            if(selectBox.val() != 'OFF') {
+                $('.holdTempContainer').show(); 
+                $('.onoffswitch').show(); 
+            } else {
+                $('.holdTempContainer').hide(); 
+                $('.onoffswitch').hide(); 
+            } 
+        });
+    });
+
+</script>
 </head>
 <body class="hold">
 
-    <center>
+    <center style="position:absolute; top:0; left:0;">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissable fixed-bottom">
+          <div class="alert alert-{{ category }} alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
               {{ message }}
             </div>
@@ -60,14 +108,7 @@
                         </div>
                     </div>
                     <div>
-                        <div class="onoffswitch">
-                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{ checked }}>
-                            <label class="onoffswitch-label" for="myonoffswitch">
-                                    <div class="onoffswitch-inner"></div>
-                                    <div class="onoffswitch-switch"></div>
-                            </label>
-                        </div>
-                        <div class="styled-select blue semi-square" style="margin: 0 auto; text-align: center;">
+                        <div class="styled-select blue semi-square" style="margin: 20px auto; text-align: center;">
                                 <select class="styled-select blue semi-square" name="timeFrame">
                                   <option value="OFF">Disable Hold</option>
                                   <option value="0.25">15 Minutes</option>
@@ -83,6 +124,13 @@
                                   <option value="FOREVER">Forever</option>
                                 </select>
                         </div>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{ checked }}>
+                            <label class="onoffswitch-label" for="myonoffswitch">
+                                    <div class="onoffswitch-inner"></div>
+                                    <div class="onoffswitch-switch"></div>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <br>
@@ -96,7 +144,7 @@
                 
                 <br>
 
-                <ul class="round-nav" style="padding:0;">
+                <ul class="round-nav" style="padding:0;margin-left: -10px;">
                     <li>
                       <a href="#" onclick="$(this).closest('form').submit()">
                         <span class="btn-icon-set blue-letterpress"></span>

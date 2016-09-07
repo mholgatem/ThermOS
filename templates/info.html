@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<head>
+    <meta text/html;charset="utf-8">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <script type='application/javascript' src="/static/jquery.min.js"></script>
+    <script type='application/javascript' src="/static/bootstrap.min.js"></script>
+    
+    
+    
+    
+    <script>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    function liveUpdate() {
+
+        $.ajax({
+            url : $SCRIPT_ROOT + "/info",
+            success : function(result){
+
+               
+                $('.container').html($(result)[15]).fadeIn().delay(80);
+               
+                /*$('#schedule').html($(result).find('#updateTemp').html());*/
+            }
+        })
+    };
+    
+        // refresh every 5 seconds
+        window.setInterval(function(){
+          liveUpdate()
+        }, 50000);
+    </script>
+</head>
+
+<body class="schedule" onload="liveUpdate();">
+    
+    <div class="container">
+    
+    <br>
+    <h2 style="float:left;">Info</h2>
+    <hr style="width:100%;">
+    {% if options %}
+        <table class="table table-striped table-bordered table-hover model-list blue-letterpress">
+
+        <tbody>
+        {% for option in options %}
+            {% for key, value in option.iteritems() %}
+                <tr>
+                    <td class="col-key">{{ key }}</td>
+                    <td class="col-value">{{ value| safe }}</td>
+                </tr>
+
+            {% endfor %}
+        {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    </div>
+        
+</body>

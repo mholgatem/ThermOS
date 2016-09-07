@@ -14,11 +14,11 @@
 
 <body class="schedule">
     
-    <center>
+    <center style="position:absolute; top:0; left:0;">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissable fixed-bottom">
+          <div class="alert alert-{{ category }} alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
               {{ message }}
             </div>
@@ -68,7 +68,7 @@
                 <td class="col-time_on">{{ option['time_on'] }}</td>
                 <td class="col-time_off">{{ option['time_off'] }}</td>
                 <td class="list-buttons-column">
-                    <a class="icon" href="/schedule/edit?id={{ option['id'] }}" title="Edit Record">
+                    <a class="icon" href="/schedule/edit?id={{ option['id'] }}&date={% if option['date'].split('/')|length == 3 %}{{ option['date'] }}{% endif %}" title="Edit Record">
                       <span class="fa fa-pencil glyphicon glyphicon-pencil blue-letterpress"></span>
                     </a>                    
                 </td>

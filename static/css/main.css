@@ -551,19 +551,24 @@ p#daemonNotRunning{
     color:#FF0000;
     font-weight:1500;
 }
+p#cool,
+p#heat,
+p#fan{
+    font-family: 'agencyfb';
+    font-size: 25px;
+    margin: 5px;
+    line-height: 20px;
+}
 p#cool{
     color:#2FCCFF;
-    font-size: 12pt;
 }
 p#heat{
     color:#FF0000;
-    font-size: 12pt;
-
 }
 p#fan{
     color:#00CC00;
-    font-size: 12pt;
 }
+
 p#coolOn{
     color:#2FCCFF;
     font-size: 24pt;
@@ -762,6 +767,11 @@ h2{
     text-shadow: 0px 2px 3px #9dcae4, -1px -1px rgba(255, 255, 255, 0.26);
 }
 
+/* bootstrap tooltip override */
+.tooltip-inner {
+    max-width: 300px;
+}
+
 /* ALERT BUTTONS */
 .alert{
     text-shadow:0 1px 0 rgba(255,255,255,.6);
@@ -838,8 +848,11 @@ h2{
     border-color: #f1bcbc;
 }
 
-.alert-dismissable,.alert-dismissible {
-    padding-right: 35px
+.alert-dismissable, .alert-dismissible {
+    padding-right: 35px;
+    z-index: 1000;
+    position: relative;
+    margin-bottom: 5px;
 }
 
 .alert-dismissable .close,.alert-dismissible .close {
