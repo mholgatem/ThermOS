@@ -90,8 +90,8 @@ class ThermOSDaemon(object):
         # compare new/old pins
         newPins = (self.config['heater_pin'], self.config['ac_pin'], self.config['fan_pin'])
         if newPins != oldPins:
-            GPIO.output(pins, False)
-            GPIO.cleanup(pins)
+            GPIO.output(oldPins, False)
+            GPIO.cleanup(oldPins)
             self.configureGPIO()
         
         # if database is corrupt, let the user know

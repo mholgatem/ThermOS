@@ -14,7 +14,7 @@
 
 <body class="schedule">
     
-    <center style="position:absolute; top:0; left:0;">
+    <div style="position:absolute; top:0; left:0;width:600px">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -25,14 +25,14 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
-    </center>
+    </div>
     
     <div class="container">
     
     <br>
     <h2 style="float:left;">Schedule</h2>
     <a class="btn" href="/schedule/edit?id=new" style="float: right;">Add Entry</a>
-    <hr style="width:100%;">
+    <hr style="width:100%;display:inline-block;">
     {% if options %}
         <table class="table table-striped table-bordered table-hover model-list blue-letterpress">
         <thead>

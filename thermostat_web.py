@@ -11,6 +11,8 @@ import RPi.GPIO as GPIO
 import scheduler
 from getIndoorTemp import getIndoorTemp
 
+'''  INITIALIZE THERMOSTAT-WEB  '''
+''''''''''''''''''''''''''''''''''''
 app = Flask(__name__)
 app.secret_key = 'DErGH65&*jKl990L.:s;6md8hgr53SD'
 
@@ -44,8 +46,9 @@ logsCursor = logsConn.cursor()
 #load any scheduled items
 calendar = scheduler.Calendar()
 
-#initialize status
+
 try:
+    GPIO.setwarnings(False)
     if 'BCM' in CONFIG['numbering_scheme']:
         GPIO.setmode(GPIO.BCM)
     else:
@@ -54,8 +57,12 @@ try:
     settingsRedirect = False
 except (ValueError, TypeError):
     settingsRedirect = True
-    
+
+
+''' WORKER FUNCTIONS '''
+''''''''''''''''''''''''
 def getWeatherGraph():
+    ''' used by /forecast to build 72 hour by hour weather graph '''
     #get latest 24 hours, hourly[0] = current hour
     startTime = str(datetime.now() - timedelta(hours=1))[:19]
     hourly = logsCursor.execute('select * from hourlyWeather \
@@ -123,6 +130,7 @@ def getWeatherGraph():
     return line_graph.render().decode("utf-8").replace("&amp;","&")
     
 def getCurrentWeather():
+    ''' parses and returns current weather information '''
     if CONFIG['weather_enabled']:
         #get latest 24 hours, hourly[0] = current hour
         startTime = str(datetime.now() - timedelta(hours=1))[:19]
@@ -147,6 +155,7 @@ def getCurrentWeather():
 
         
 def getDailyWeather():
+    ''' parses and returns daily weather information '''
     if CONFIG['weather_enabled']:
         logsCursor.execute("SELECT * FROM (SELECT * FROM dailyWeather ORDER BY date DESC LIMIT 8) ORDER BY date ASC")
         daily = [dict(row) for row in logsCursor]
@@ -195,13 +204,11 @@ def getDailyWeather():
             else:
                 day['windBearing'] = ''
                 
-            
-                
-            
         return daily
     return []
 
 def getCurrentWeatherAlerts():
+    ''' returns any relevant daily weather alerts '''
     if CONFIG['weather_enabled']:
         #get latest week, daily[0] = current day
         daily = logsCursor.execute('SELECT * FROM dailyWeather WHERE date(date) = date("{0}")'.format(datetime.now().date()) ).fetchone()
@@ -210,18 +217,20 @@ def getCurrentWeatherAlerts():
     return '<div id="weatherAlertContainer"></div>'
 
 def getWhatsOn():
-    
-    heatStatus = "ON" if CONFIG['heater_pin'] and GPIO.input(CONFIG['heater_pin']) else "OFF"
-    coolStatus = "ON" if CONFIG['ac_pin'] and GPIO.input(CONFIG['ac_pin']) else "OFF"
-    fanStatus = "ON" if CONFIG['fan_pin'] and GPIO.input(CONFIG['fan_pin']) else "OFF"
-
-    heatString = '<p id="heat">HEAT (GPIO {0}): {1} </p>'.format(CONFIG['heater_pin'], heatStatus)
-    coolString = '<p id="cool">COOL (GPIO {0}): {1} </p>'.format(CONFIG['ac_pin'], coolStatus)
-    fanString = '<p id="fan">FAN (GPIO {0}): {1} </p>'.format(CONFIG['fan_pin'], fanStatus)
-
-    return heatString + coolString + fanString
+    ''' get the current state of the gpio pins '''
+    pins = {'heat': CONFIG['heater_pin'], 'cool': CONFIG['ac_pin'], 'fan': CONFIG['fan_pin']}
+    html = ''
+    for key,value in pins.iteritems():
+        try:
+            temp = "ON" if type(value) == int and GPIO.input(value) else "OFF"
+        except:
+            temp = "Misconfigured"
+        html += '<p id="{0}">{1} (GPIO {2}): {3} </p>'.format(key, key.upper(), value, temp)
+    return html
 
 def getDaemonStatus():
+    ''' get the current status of thermostat-daemon. 
+        Only used by /info for troubleshooting '''
     try:
         if 'active' in subprocess.check_output(['systemctl', 'is-active', 'thermostat-daemon']):
             return '<p id="daemonRunning"> Daemon is running. </p>'
@@ -232,6 +241,8 @@ def getDaemonStatus():
 
 
 def getValueByType(xName, xValue):
+    ''' used by settings_submit to validate
+        entries based on type '''
     try:
         if 'int' in xName[:3]:
             return int(xValue) if xValue else 0
@@ -244,7 +255,8 @@ def getValueByType(xName, xValue):
         return None
 
 def getModeHTML(status):
-
+    ''' used by /info and /_liveUpdate to display
+        relevant heating/cooling targets + schedule info '''
     mode = calendar.getStatusHTML()
     if status['mode'] == 'AUTO' or 'HOLD' in mode:
         return mode
@@ -257,6 +269,7 @@ def getModeHTML(status):
     return '<div id="scheduleEntry"></div>' + mode
         
 def reloadDaemon():
+    ''' reload thermostat-daemon '''
     global CONFIG, calendar
     try:
         if 'active' in subprocess.check_output(['systemctl', 'is-active', 'thermostat-daemon']):
@@ -265,18 +278,22 @@ def reloadDaemon():
         subprocess.call(("systemctl", "start", "thermostat-daemon"))
     CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
     calendar.loadCalendar(forceReload = True)
-    
+
+
+''' FLASK APP ROUTES '''
+''''''''''''''''''''''''
+
+'''   INDEX    '''
+''''''''''''''''''
 @app.route('/')
 def main_form():
-    status = thermCursor.execute('SELECT * FROM status').fetchone()
-
     if settingsRedirect:
         flash("You must setup your system before you can continue","warning")
-        flash("HINT: Hover over an item to get see a description","info")
-        return render_template("index.html", openSettings = '$( "#settings-btn" ).click();')
+        flash("HINT: Hover over an item to see a description","info")
+        return redirect(url_for('settings_form'))
+        #return render_template("index.html", openSettings = '$( "#settings-btn" ).click();')
     else:
-        whatsOn = getWhatsOn()
-        daemonStatus = getDaemonStatus()
+        status = thermCursor.execute('SELECT * FROM status').fetchone()
         return render_template("index.html",unit = CONFIG['units'],
                                             fanStatus = status['fan_mode'],
                                             systemStatus = status['mode'],
@@ -284,7 +301,8 @@ def main_form():
                                             alerts = getCurrentWeatherAlerts())
 
                                         
-                                        
+'''  SCHEDULE  '''
+''''''''''''''''''
 @app.route('/schedule')
 def schedule_form():
     options = thermCursor.execute('SELECT * FROM schedule where not id = -1').fetchall() 
@@ -382,6 +400,9 @@ def schedule_submit():
 
     return render_template("schedule_edit_form.html", entry=entry)
 
+    
+'''  HOLD  '''
+''''''''''''''''''
 @app.route("/hold", methods=['POST'])
 def hold_submit():
 
@@ -417,9 +438,9 @@ def hold_submit():
             thermCursor.execute('INSERT OR REPLACE INTO schedule values (?, ?, ?, ?, ?, ?)', 
                                                         (-1, targetHeat, targetCool, date, time_on, time_off))
             thermConn.commit()
-            flash("Thermostat will {mode} to {temp} for {time} {hours}".format(mode=mode, 
+            flash("Thermostat will {mode} to {temp} until {time}".format(mode=mode, 
                                                                        temp=newTargetTemp, 
-                                                                       time = time_frame if time_frame else 'forever',
+                                                                       time = time_off if time_frame else 'forever',
                                                                        hours = 'hours' if time_frame else ''), 
                                                                        'info')
                                                                        
@@ -441,28 +462,10 @@ def hold_form():
         checked = 'checked'
     return render_template("hold_form.html", targetTemp = (targetCool + targetHeat) / 2,
                                              checked = checked)
-                                             
-@app.route('/info')
-def info_form():
-    status = thermCursor.execute('SELECT * FROM status').fetchone()
-    schedule = (getModeHTML(status)
-                    .replace('targetTemps"','targetTemps" style="display:inline-block;"')
-                    .replace('target-heat"', 'target-heat" style="display:inline-block;width: 135px;"')
-                    .replace('target-cool"', 'target-cool" style="display:inline-block;width: 135px;"'))
-    options = [{'system Time': datetime.now().strftime('%I:%M %p %A, %B %d')},
-                {'temp': str(round(getIndoorTemp(CONFIG['units'], CONFIG['temperature_offset']),1))},
-                {'Mode': status['mode']},
-                {'Fan Mode': status['fan_mode']},
-                {'GPIO Status': getWhatsOn()},
-                {'Schedule': schedule},
-                {'Daemon': getDaemonStatus()},
-                {'Hold Time': calendar.getRemainingHoldTime()}
-               ]
-    
-    return render_template("info.html", options = options)
 
 
-                                        
+'''  SYSTEM  '''
+''''''''''''''''''
 @app.route('/system')
 def system_form():
     status = thermCursor.execute('SELECT * FROM status').fetchone()
@@ -521,6 +524,8 @@ def system_submit():
     return redirect(url_for('system_form'))
                                         
                                                     
+'''  SETTINGS  '''
+''''''''''''''''''
 @app.route("/settings", methods=['POST'])
 def settings_submit():
     
@@ -556,7 +561,6 @@ def settings_submit():
     for key, value in request.form.iteritems():
         temp = ''
         temp = getValueByType(key, value)
-        print key, temp
         if temp != None: # if valid entry
             formItems[key] = temp
         else:
@@ -603,90 +607,71 @@ def settings_submit():
         thermCursor.execute('INSERT INTO settings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', values)
         thermConn.commit()    
         
-        # tell thermostat-daemon to reload config
-        reloadDaemon()
-        
-        # reload gpio
+        # get globals (for setting later)
         global CONFIG, settingsRedirect
-        CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
-        if 'BCM' in CONFIG['numbering_scheme']:
-            GPIO.setmode(GPIO.BCM)
-        else:
-            GPIO.setmode(GPIO.BOARD)
-        GPIO.setwarnings(False)
-        try:
-            GPIO.setup([CONFIG['heater_pin'], CONFIG['ac_pin'], CONFIG['fan_pin']], GPIO.OUT)
-            # if user was redirected here, send them to the main page
-            settingsRedirect = False
-            flash("Settings have been saved!", "success")
-            return redirect(url_for('settings_form'))
-        except ValueError:
-            flash("Error setting one of the GPIO pins", "danger")
-
         
-    # On invalid entry, re-render settings form with current valid entries
-    return render_template("settings_form.html", 
-                            units = formItems['option-temperature-units'],
-                            checkedDebug = 'checked' if debugEnabled else '',
-                            unitCelsius = "selected" if formItems['option-temperature-units'] == 'C' else '',
-                            unitFarenheit = "selected" if formItems['option-temperature-units'] != 'C' else '',
-                            activeHysteresis = formItems['float-active-hysteresis'],
-                            inactiveHysteresis = formItems['float-inactive-hysteresis'],
-                            schemeBoard = "selected" if formItems['option-numbering-scheme'] != 'BCM' else "",
-                            schemeBCM = "selected" if formItems['option-numbering-scheme'] == 'BCM' else "",
-                            acPin = formItems['int-ac-pin'],
-                            heatPin = formItems['int-heat-pin'],
-                            fanPin = formItems['int-fan-pin'],
-                            tempOffset = formItems['float-temperature-offset'],
-                            checkedWeather = 'checked' if weatherEnabled else '',
-                            apiKey = formItems['text-api-key'],
-                            latitude = formItems['float-latitude'],
-                            longitude = formItems['float-longitude'],
-                            checkedMail = 'checked' if mailEnabled else '',
-                            errorThreshold = formItems['float-error-threshold'],
-                            smtpServer = formItems['text-smtp-server'],
-                            smtpPort = formItems['int-smtp-port'],
-                            mailUsername = formItems['text-username'],
-                            mailPassword = formItems['text-password'],
-                            mailSender = formItems['text-sender'],
-                            mailRecipient = formItems['text-recipient']
-                            )
+        # get current (old) pins
+        oldPins = (CONFIG['heater_pin'], CONFIG['ac_pin'], CONFIG['fan_pin'])
+        oldNumbering = CONFIG['numbering_scheme']
+        
+        # reload databases
+        CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
+        
+        # get submitted (new) pins
+        newPins = (CONFIG['heater_pin'], CONFIG['ac_pin'], CONFIG['fan_pin'])
+        newNumbering = CONFIG['numbering_scheme']
+        
+        # compare new/old pins
+        if newPins != oldPins or newNumbering != oldNumbering :
+        
+            #stop daemon
+            subprocess.call(("systemctl", "stop", "thermostat-daemon"))
+            
+            #cleanup pins
+            try:
+                oldPins = [ x for x in oldPins if type(x) == int and x > 0 ]
+                GPIO.output(oldPins, False)
+                GPIO.cleanup(oldPins)
+            except:
+                GPIO.cleanup(oldPins)
+            
+            # reconfigure gpio with new pins
+            GPIO.setwarnings(False)
+            if 'BCM' in CONFIG['numbering_scheme']:
+                GPIO.setmode(GPIO.BCM)
+            else:
+                GPIO.setmode(GPIO.BOARD)
+            try:
+                GPIO.setup([CONFIG['heater_pin'], CONFIG['ac_pin'], CONFIG['fan_pin']], GPIO.OUT)
+                
+                # restart daemon
+                subprocess.call(("systemctl", "start", "thermostat-daemon"))
+                flash("Settings have been saved!", "success")
+                
+                # if user was redirected here, send them to the main page
+                if settingsRedirect:
+                    settingsRedirect = False
+                    return redirect(url_for('main_form'))
+                    #return render_template("settings_form.html", config = CONFIG)
+            except ValueError:
+                flash("Error setting one of the GPIO pins", "danger")
+        else: #pins have not changed
+            # tell thermostat-daemon to reload config
+            reloadDaemon()
+    
+    # re-render settings form with current entries
+    values = dict(zip(map(str.lower, thermCursor.execute('SELECT * FROM settings').fetchone().keys()), values))
+    return render_template("settings_form.html", config = values)
 
 @app.route('/settings')
 def settings_form():
     global CONFIG
-    if settingsRedirect:
-        return render_template("settings_form.html")
-    else:
-        CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
-        return render_template("settings_form.html",    
-                                units = CONFIG['units'],
-                                checkedDebug = 'checked' if CONFIG['debug'] else '',
-                                unitCelsius = "selected" if CONFIG['units'] == 'C' else '',
-                                unitFarenheit = "selected" if CONFIG['units'] != 'C' else '',
-                                activeHysteresis = CONFIG['active_hysteresis'],
-                                inactiveHysteresis = CONFIG['inactive_hysteresis'],
-                                schemeBoard = "selected" if CONFIG['numbering_scheme'] != 'BCM' else "",
-                                schemeBCM = "selected" if CONFIG['numbering_scheme'] == 'BCM' else "",
-                                acPin = CONFIG['ac_pin'],
-                                heatPin = CONFIG['heater_pin'],
-                                fanPin = CONFIG['fan_pin'],
-                                tempOffset = CONFIG['temperature_offset'],
-                                checkedWeather = 'checked' if CONFIG['weather_enabled'] else '',
-                                apiKey = CONFIG['api_key'],
-                                latitude = CONFIG['latitude'],
-                                longitude = CONFIG['longitude'],
-                                checkedMail = 'checked' if CONFIG['mail_enabled'] else '',
-                                errorThreshold = CONFIG['error_threshold'],
-                                smtpServer = CONFIG['smtp_server'],
-                                smtpPort = CONFIG['smtp_port'],
-                                mailUsername = CONFIG['username'],
-                                mailPassword = CONFIG['password'],
-                                mailSender = CONFIG['sender'],
-                                mailRecipient = CONFIG['recipient']
-                                )
+    CONFIG = thermCursor.execute('SELECT * FROM settings').fetchone()
+    return render_template("settings_form.html", config = CONFIG)
 
                             
+'''  FORECAST  '''
+''''''''''''''''''
 @app.route('/forecast')
 def forecast_form():
     alerts = getCurrentWeatherAlerts()
@@ -694,15 +679,18 @@ def forecast_form():
     forecast = getDailyWeather()
     hideForecast = 'hidden' if not forecast else ''
     
-    return render_template("weather.html", graph = getWeatherGraph(),
-                                                hideForecast = hideForecast,
-                                                forecast = forecast,
-                                                hideAlerts = hideAlerts,
-                                                alerts = alerts)        
+    return render_template("weather.html",  graph = getWeatherGraph(),
+                                            hideForecast = hideForecast,
+                                            forecast = forecast,
+                                            hideAlerts = hideAlerts,
+                                            alerts = alerts)        
 
-    
+
+'''  LOGS  '''
+''''''''''''''''''                                            
 @app.route('/_daemonLogs', methods= ['GET'])
 def updateDaemonLogs():
+    ''' returns a table with the thermostat-daemon journal '''
     weekAgo = (datetime.now() + timedelta(days=-7)).date()
     raw = subprocess.check_output(['journalctl', '-u', 'thermostat-daemon', '--since={0}'.format(weekAgo)])
     head = ('<head>' + 
@@ -734,9 +722,12 @@ def updateDaemonLogs():
     html += '</tbody></table></div></body>'
     return head + html
 
+
+'''  FAN TOGGLE  '''
+''''''''''''''''''    
 @app.route('/_fanMode', methods= ['POST'])
 def toggleFan():
-    #verify request
+    ''' used to change the state of the fan '''
     if 'toggle' in request.form:
         status = thermCursor.execute('SELECT * FROM status').fetchone()
         if status['fan_mode'] == 'AUTO':
@@ -745,7 +736,7 @@ def toggleFan():
             fanMode = 'AUTO'
         
         thermCursor.execute('DELETE FROM status')
-        thermCursor.execute('INSERT INTO status VALUES (?, ?, ?, ?)', (status['target_cool'],
+        thermCursor.execute('INSERT INTO status VALUES (?, ?, ?, ?)', ( status['target_cool'],
                                                                         status['target_heat'],
                                                                         status['mode'],
                                                                         fanMode))
@@ -753,8 +744,34 @@ def toggleFan():
         return fanMode
     return ''
 
+
+'''  INFO  '''
+''''''''''''''''''                                             
+@app.route('/info')
+def info_form():
+    status = thermCursor.execute('SELECT * FROM status').fetchone()
+    schedule = (getModeHTML(status)
+                    .replace('targetTemps"','targetTemps" style="display:inline-block;"')
+                    .replace('target-heat"', 'target-heat" style="display:inline-block;width: 135px;"')
+                    .replace('target-cool"', 'target-cool" style="display:inline-block;width: 135px;"'))
+    options = [{'system Time': datetime.now().strftime('%I:%M %p %A, %B %d')},
+                {'temp': str(round(getIndoorTemp(CONFIG['units'], CONFIG['temperature_offset']),1))},
+                {'Mode': status['mode']},
+                {'Fan Mode': status['fan_mode']},
+                {'GPIO Status': getWhatsOn()},
+                {'Schedule': schedule},
+                {'Daemon': getDaemonStatus()},
+                {'Hold Time': calendar.getRemainingHoldTime()}
+               ]
+    
+    return render_template("info.html", options = options)
+    
+
+'''  AJAX  '''
+''''''''''''''''''    
 @app.route('/_liveUpdate', methods= ['GET'])
 def liveUpdate():
+    ''' Generic form used to update main form via ajax request '''
     status = thermCursor.execute('SELECT * FROM status').fetchone()
     schedule = getModeHTML(status)
     html = '<div id="updateContainer"> \
