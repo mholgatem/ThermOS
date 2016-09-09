@@ -30,7 +30,9 @@ sudo bash install.sh
 ```
 On a computer or smartphone, ***navigate to the ip address of your raspberry pi to finish setup***.
 
-## Icon Credits
+## Credits
+ThermOS started life as [Rubustat by wywin](https://github.com/wywin/Rubustat) and quickly took on a life of it's own; but there are still a few bits of code left over from those early days.
+
 The following icons came from [thenounproject.com](https://thenounproject.com)<br>
 *"Folder"* (logs icon) by **Oliviu Stoian**<br>
 *"Air Conditioner"* (system icon) by **Aaron K. Kim**<br>
