@@ -1,6 +1,8 @@
 [<img src="../gh-pages/images/banner.jpg">](https://mholgatem.github.io/ThermOS/)
 
 ## Setup
+### [`Check out the full setup instructions here`](https://mholgatem.github.io/ThermOS/setup)
+
 This thermostat requires the use of a **DS18B20** temperature sensor. **An alternative sensor can be used, but the getIndoorTemp.py file will need to be modified to gather and return the correct data.** I may at some point add the option to use a DHT-22 (combo temp/humidity sensor); but this is adequate for now. 
 
 ### -DS18B20-
