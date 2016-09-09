@@ -3,6 +3,23 @@
 ## Setup
 This thermostat requires the use of a **DS18B20** temperature sensor. **An alternative sensor can be used, but the getIndoorTemp.py file will need to be modified to gather and return the correct data.** I may at some point add the option to use a DHT-22 (combo temp/humidity sensor); but this is adequate for now. 
 
+### -DS18B20-
+Your ***DATA*** line needs to be connected to your ***VDD/POWER*** line with a ***4.7K ohm resistor***<br>
+Then do the following:<br>
+***DATA* on gpio 4 (*physical pin 7*)<br>
+*VDD/POWER* on 5v rail (*physical pin 2*)<br>
+*GROUND* on any ground pin (*physical pin 6*)**
+
+Next, enable the 1-wire interface.<br>
+This can be done by adding the line<br>
+**dtoverlay=w1-gpio**<br>
+to **/boot/config.txt**<br>
+     *-or-*<br>
+by using an up-to-date **raspi-config** (Advanced Options -> 1-Wire)
+
+Reboot and your temperature sensor is good to go.
+
+### -SOFTWARE-
 On a fresh Raspbian Jessie image (full or lite)<br>
 
 ```
@@ -11,7 +28,7 @@ git clone https://github.com/mholgatem/ThermOS
 cd ~/ThermOS  
 sudo bash install.sh
 ```
-On a computer or smartphone, navigate to the ip address of your raspberry pi to finish setup.
+On a computer or smartphone, ***navigate to the ip address of your raspberry pi to finish setup***.
 
 ## Icon Credits
 The following icons came from [thenounproject.com](https://thenounproject.com)<br>
