@@ -44,5 +44,5 @@ The following icons came from [thenounproject.com](https://thenounproject.com)<b
 *"Snowflake"* (ac icon) by **Dilon Choudry**<br>
 
 
-This application is free, without restriction, or warranty.<br>
-Don't sue me bro!
+*This application is free, without restriction, or warranty.<br>
+Don't sue me bro!*
