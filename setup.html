@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en-us"><head>
+    <meta charset="UTF-8">
+    <title>ThermOS by mholgatem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/jquery.gridder.min.css" media="screen">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="js/jquery.gridder.min.js"></script>
+
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">ThermOS</h1>
+      <h2 class="project-tagline">Another Raspberry Pi Thermostat</h2>
+      <a href="https://github.com/mholgatem/ThermOS" class="btn">View on GitHub</a>
+      <a href="https://github.com/mholgatem/ThermOS/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/mholgatem/ThermOS/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+  
+
+
+<h2><a id="user-content-setup" class="anchor" href="#setup" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setup</h2>
+
+<p>This thermostat requires the use of a <strong>DS18B20</strong> temperature sensor. <strong>An alternative sensor can be used, but the getIndoorTemp.py file will need to be modified to gather and return the correct data.</strong> I may at some point add the option to use a DHT-22 (combo temp/humidity sensor); but this is adequate for now. </p>
+
+<h3><a id="user-content--ds18b20-" class="anchor" href="#-ds18b20-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>-DS18B20-</h3>
+
+<p>Your <strong><em>DATA</em></strong> line needs to be connected to your <strong><em>VDD/POWER</em></strong> line with a <strong><em>4.7K ohm resistor</em></strong><br>
+Then do the following:<br>
+<strong><em>DATA</em> on gpio 4 (<em>physical pin 7</em>)<br>
+<em>VDD/POWER</em> on 5v rail (<em>physical pin 2</em>)<br>
+<em>GROUND</em> on any ground pin (<em>physical pin 6</em>)</strong></p>
+
+<p>Next, enable the 1-wire interface.<br>
+This can be done by adding the line<br>
+<strong>dtoverlay=w1-gpio</strong><br>
+to <strong>/boot/config.txt</strong><br>
+     <em>-or-</em><br>
+by using an up-to-date <strong>raspi-config</strong> (Advanced Options -&gt; 1-Wire)</p>
+
+<p>Reboot and your temperature sensor is good to go.</p>
+
+<h3><a id="user-content--GPIO-" class="anchor" href="#-GPIO-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>-GPIO to SYSTEM-</h3><p>
+  In order to control your ac system with your raspberry pi, you are going to need to use an intermediary known as a solid-state-relay or SSR. You can think of it as a series of light switches which can be turned on and off with your GPIO.<br><br>
+
+This section will vary depending on your system (my system uses a 4-wire ac/heat/fan/neutral).<br><strong>Avoid using physical pins 8 &amp; 10 (gpio 14 &amp; 15)</strong> as they will output a signal when the system is booting up, which would temporarily activate your system.<br><br> 
+
+  <strong>I recommend using physical pins 11, 13, &amp; 15 (GPIO 17, 27, &amp; 22)</strong>, but it's up to you. Then use physical pin 4 (5v) to control the logic chip on the ssr. You will tell the system which pins you are using while setting up the web interface.
+  
+  
+</p><img src="images/setup-ssr.jpg"><h3><a id="user-content--software-" class="anchor" href="#-software-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>-SOFTWARE-</h3>
+
+<p>On a fresh Raspbian Jessie image (full or lite)<br></p>
+
+<pre><code>cd ~  
+git clone https://github.com/mholgatem/ThermOS  
+cd ~/ThermOS  
+sudo bash install.sh
+</code></pre>
+
+<p>On a computer or smartphone, <strong><em>navigate to the ip address of your raspberry pi to finish setup</em></strong>.</p>
+
+<h2><a id="user-content-credits" class="anchor" href="#credits" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Credits</h2>
+
+<p>ThermOS started life as <a href="https://github.com/wywin/Rubustat">Rubustat by Wyatt Winters</a> and quickly took on a life of it's own; but there are still a few bits of code left over from those early days.</p>
+
+<p>The following icons came from <a href="https://thenounproject.com">thenounproject.com</a><br>
+<em>"Folder"</em> (logs icon) by <strong>Oliviu Stoian</strong><br>
+<em>"Air Conditioner"</em> (system icon) by <strong>Aaron K. Kim</strong><br>
+<em>"Computer Fan"</em> (fan icon) by <strong>Creative Stall</strong><br>
+<em>"Thermometer"</em> (hold icon) by <strong>icon 54</strong><br>
+<em>"Wrench"</em> (settings icon) by <strong>useiconic.com</strong><br>
+<em>"Calendar"</em> (schedule icon) by <strong>To Uyen</strong><br>
+<em>"Flame"</em> (heat icon) by <strong>Nadav Barkan</strong><br>
+<em>"Snowflake"</em> (ac icon) by <strong>Dilon Choudry</strong><br></p>
+
+<p><em>This application is free, without restriction, or warranty.<br>
+Don't sue me bro!</em></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/mholgatem/ThermOS">ThermOS</a> is maintained by <a href="https://github.com/mholgatem">mholgatem</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+</body></html>
