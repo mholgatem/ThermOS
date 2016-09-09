@@ -646,17 +646,19 @@ def settings_submit():
                 
                 # restart daemon
                 subprocess.call(("systemctl", "start", "thermostat-daemon"))
-                flash("Settings have been saved!", "success")
                 
                 # if user was redirected here, send them to the main page
                 if settingsRedirect:
                     settingsRedirect = False
                     return redirect(url_for('main_form'))
-                    #return render_template("settings_form.html", config = CONFIG)
+                else:
+                    flash("Settings have been saved!", "success")
+
             except ValueError:
                 flash("Error setting one of the GPIO pins", "danger")
         else: #pins have not changed
             # tell thermostat-daemon to reload config
+            flash("Settings have been saved!", "success")
             reloadDaemon()
     
     # re-render settings form with current entries
