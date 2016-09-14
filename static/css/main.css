@@ -1391,15 +1391,13 @@ table#forecast .sticky-col > div > span:last-child {
 }
 
 .moon-phase.inner {
-    width: 120%;
-    height: 120%;
+    width: 100%;
+    height: 100%;
     background-color: #29465d;
     display: inline-block;
     border-radius: 72px;
     position: relative;
     float: right;
-    top: -10%;
-    right: -10%;
 }
 
 table#forecast .forecast-icon{
