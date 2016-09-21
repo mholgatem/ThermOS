@@ -35,6 +35,8 @@ On a computer or smartphone, ***navigate to the ip address of your raspberry pi 
 ## Credits
 ThermOS started life as [Rubustat by Wyatt Winters](https://github.com/wywin/Rubustat) and quickly took on a life of it's own; but there are still a few bits of code left over from those early days.
 
+The forecast api is [powered by Dark Sky](https://darksky.net/poweredby/)
+
 The following icons came from [thenounproject.com](https://thenounproject.com)<br>
 *"Folder"* (logs icon) by **Oliviu Stoian**<br>
 *"Air Conditioner"* (system icon) by **Aaron K. Kim**<br>
