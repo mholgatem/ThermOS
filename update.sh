@@ -11,7 +11,7 @@ case $key in
 esac
 
 #check for gunicorn
-if [ "$( pip list | grep -F gunicorn)" == ""]; then
+if [ "$( pip list | grep -F gunicorn)" == "" ]; then
   sudo pip install gunicorn
 fi
 
@@ -19,7 +19,7 @@ cd /home/pi/ThermOS
 path="/home/pi/thermos_backup/$(date +%Y_%m_%d-%H_%M_%S)/"
 echo "Creating backup in: $path"
 mkdir -p "$path"
-sudo cp -rf . "$path"
+cp -rf . "$path"
 if [ "$cmd" == "hard_reset" ]; then
   git reset --hard origin/master
 else
