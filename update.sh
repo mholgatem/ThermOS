@@ -40,6 +40,7 @@ sudo cp thermostat-web.service /lib/systemd/system/
 sudo systemctl stop thermostat-web
 sudo systemctl stop thermostat-daemon
 sudo systemctl daemon-reload
+
 echo "Reloading daemon and restarting services..."
 sudo systemctl start thermostat-daemon
 sudo systemctl start thermostat-web
