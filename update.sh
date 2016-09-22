@@ -15,7 +15,7 @@ if [ "$( pip list | grep -F gunicorn)" == ""]; then
   sudo pip install gunicorn
 fi
 
-cd ~/ThermOS
+cd /home/pi/ThermOS
 path="/home/pi/thermos_backup/$(date +%Y_%m_%d-%H_%M_%S)/"
 echo "Creating backup in: $path"
 mkdir -p "$path"
