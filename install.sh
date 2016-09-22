@@ -42,6 +42,8 @@ sudo systemctl daemon-reload
 sudo systemctl start thermostat-daemon
 sudo systemctl start thermostat-web
 
+chown 755 update.sh
+
 echo
 echo
 echo "-----------------"
