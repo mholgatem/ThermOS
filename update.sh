@@ -16,11 +16,11 @@ if [ "$( pip list | grep -F gunicorn)" == ""]; then
 fi
 
 cd ~/ThermOS
+path="/home/pi/thermos_backup/$(date +%Y_%m_%d-%H_%M_%S)/"
+echo "Creating backup in: $path"
+mkdir -p "$path"
+sudo cp -rf . "$path"
 if [ "$cmd" == "hard_reset" ]; then
-  path="/home/pi/thermos_backup/$(date +%Y_%m_%d-%H_%M)/"
-  echo "Creating backup in: $path"
-  mkdir -p "$path"
-  sudo cp -rf . "$path"
   git reset --hard origin/master
 else
   # stash user changes, pull update, re-add user changes
