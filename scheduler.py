@@ -5,9 +5,10 @@ from datetime import *
 
 
 conn = sqlite3.connect("logs/thermostat.db", check_same_thread = False)
+conn.row_factory = sqlite3.Row
 c = conn.cursor()
     
-def getStringDate(string):
+def convertStringDate(string):
     ''' convert string to date or bitmask
         monday-Sunday = 0-6
         return weight, specific dates override
@@ -54,7 +55,7 @@ def getStringDate(string):
             
     return bitMask, weight
     
-def getStringTime(string):
+def convertStringTime(string):
     ''' convert string to datetime.time()
         formats include 12-hour (3:05 PM/3:05pm)
         and 24-hour (15:05)'''
@@ -85,7 +86,7 @@ class Calendar(object):
     
     def loadCalendar(self, forceReload = False):
         if forceReload or (datetime.now() - self.lastUpdate).seconds > 60:
-            self.entries = [DatabaseEntry(*x) for x in c.execute('SELECT * FROM schedule').fetchall()]
+            self.entries = [DatabaseEntry(x) for x in c.execute('SELECT * FROM schedule').fetchall()]
             self.timeline = [self.constructTimeline(datetime.now() + timedelta(days = x)) for x in xrange(-2,3)]
             self.lastUpdate = datetime.now()
         
@@ -143,10 +144,10 @@ class Calendar(object):
     def getRemainingHoldTime(self):
         x = c.execute('SELECT * FROM schedule WHERE id = -1').fetchone()
         if x:
-            if x[3] == 'ALWAYS':
+            if x['date'] == 'ALWAYS':
                 return 'FOREVER'
             else:
-                x = self.timeFrame(datetime.now().date(), DatabaseEntry(*x))
+                x = self.timeFrame(datetime.strptime(x["date"], "%Y/%m/%d").date(), DatabaseEntry(x))
                 remaining = (x["off"] - datetime.now())
                 if remaining.days < 0:
                     c.execute('DELETE FROM schedule WHERE id = -1')
@@ -217,14 +218,14 @@ class Calendar(object):
         
 
 class DatabaseEntry(object):
-    def __init__(self, id, target_heat, target_cool, date, timeOn, timeOff):
-        self.id = id
-        self.target_heat = target_heat
-        self.target_cool = target_cool
-        self.dateString = date
-        self.dateMask, self.weight = getStringDate(date)
-        self.timeOn = getStringTime(timeOn)
-        self.timeOff = getStringTime(timeOff)
+    def __init__(self, row):
+        self.id = row['id']
+        self.target_heat = row['target_heat']
+        self.target_cool = row['target_cool']
+        self.dateString = row['date']
+        self.dateMask, self.weight = convertStringDate(row['date'])
+        self.timeOn = convertStringTime(row['time_on'])
+        self.timeOff = convertStringTime(row['time_off'])
         
         # MAKE SURE 'HOLD' OVERRIDES EVERYTHING ELSE
         if self.id == -1:
