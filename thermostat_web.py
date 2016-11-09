@@ -743,6 +743,7 @@ def toggleFan():
                                                                         status['mode'],
                                                                         fanMode))
         thermConn.commit()
+        reloadDaemon()
         return fanMode
     return ''
 
