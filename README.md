@@ -32,6 +32,22 @@ sudo bash install.sh
 ```
 On a computer or smartphone, ***navigate to the ip address of your raspberry pi to finish setup***.
 
+### -UPDATER-
+There is an included update script that can pull updates directly from this repository. <br>The updater will first make a backup of your current ThermOS install to **/home/pi/thermos_backup/date**
+
+To use:
+
+```
+cd ~/ThermOS
+bash update.sh
+```
+All of your settings will be preserved between updates. If you really messed something up, you can do a **hard reset** to get back to a 'factory install' state simply by running the script like this:
+
+```
+cd ~/ThermOS
+bash update.sh --hard
+```
+
 ## Credits
 ThermOS started life as [Rubustat by Wyatt Winters](https://github.com/wywin/Rubustat) and quickly took on a life of it's own; but there are still a few bits of code left over from those early days.
 
