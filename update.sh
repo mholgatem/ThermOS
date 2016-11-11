@@ -1,4 +1,4 @@
-UPDATER_VERSION = 1.2
+UPDATER_VERSION=1.2
 UPDATE_BASE=https://raw.githubusercontent.com/mholgatem/ThermOS/master/update.sh
 
 runSelfUpdate() {
@@ -9,10 +9,11 @@ runSelfUpdate() {
     echo "File requested: $UPDATE_BASE"
     echo "Running current version of updater..."
   else
+    echo "Success."
     # Copy over modes from old version
-    OCTAL_MODE=$(stat -c '%a' $SELF)
+    OCTAL_MODE=$(stat -c '%a' $0)
     if ! chmod $OCTAL_MODE "$0.tmp" ; then
-      echo "Failed: Error while trying to set mode on $0.tmp."
+      echo "Failed: Error while trying to set permissions for $0.tmp."
     else
       mv "$0.tmp" "$0"
     fi
