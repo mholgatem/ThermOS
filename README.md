@@ -21,7 +21,7 @@ by using an up-to-date **raspi-config** (Advanced Options -> 1-Wire)
 
 Reboot and your temperature sensor is good to go.
 
-### -SOFTWARE-
+### -INSTALLATION-
 On a fresh Raspbian Jessie image (full or lite)<br>
 
 ```
