@@ -1280,6 +1280,7 @@ table#forecast {
     margin: 5px 0;
     height: 450px;
     background-color: #95b8d4;
+    line-height: 1.9rem;
 }
 
 table#forecast tbody{
@@ -1376,7 +1377,7 @@ table#forecast .sticky-col > div > span:last-child {
     font-size: 19px;
     font-family: agencyfb;
     color: #555555;
-    margin-top: -9px;
+    /*margin-top: -9px;*/
     text-shadow: 1px 1px 1px #fff;
 }
 
