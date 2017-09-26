@@ -1267,6 +1267,14 @@ body.schedule .table-striped > thead > tr > th {
     margin: 10px 25px;
 }
 
+.text-overlay > .serie-1 > text {
+	fill: rgba(117, 0, 255, 1) !important;
+}
+
+.legends > .legend > text{
+	fill: white !important;
+}
+
 table#forecast {
     width: 1900px;
     max-width: 1900px;

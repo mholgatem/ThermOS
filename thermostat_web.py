@@ -70,6 +70,7 @@ def getWeatherGraph():
 
     times = []
     temps = []
+    uvIndex = []
     majorX = ["Now"]
     for hourlyData in hourly:
         if hourlyData == hourly[0]:
@@ -83,6 +84,7 @@ def getWeatherGraph():
                 majorX.append(time)
         times.append(time)
         temps.append(hourlyData['temperature'])
+        uvIndex.append(hourlyData['uvIndex'] if not None else 0)
 
     pygal.style.DarkSolarizedStyle.label_font_family = 'agencyfb'
     pygal.style.DarkSolarizedStyle.label_font_family = 'agencyfb'
@@ -98,7 +100,7 @@ def getWeatherGraph():
     pygal.style.DarkSolarizedStyle.tooltip_font_family = 'agencyfb'
     pygal.style.DarkSolarizedStyle.tooltip_font_size = 25
     
-    pygal.style.DarkSolarizedStyle.colors = ('rgba(246,190,28,.7)', 'rgba(0, 255, 255, 0.45)', '#E95355', '#E87653', '#E89B53')
+    pygal.style.DarkSolarizedStyle.colors = ('rgba(246,190,28,.7)', 'rgba(117, 0, 255, 0.45)', '#E95355', '#E87653', '#E89B53')
     pygal.style.DarkSolarizedStyle.background = 'rgba(31, 53, 70, 0.01)'
     pygal.style.DarkSolarizedStyle.plot_background = 'none'
     
@@ -114,7 +116,7 @@ def getWeatherGraph():
                             #title = "Currently {0}&deg;{1}".format(hourly[0]['temperature'], CONFIG['units']), 
                             interpolate = "cubic",
                             fill = True,
-                            show_legend = False,
+                            show_legend = True,
                             #legend_box_size=25,
                             print_values=True,
                             #print_values_position='top',
@@ -125,7 +127,9 @@ def getWeatherGraph():
     line_graph.x_labels = times
     line_graph.x_labels_major = majorX
     line_graph.value_formatter = lambda x: "%.1f" % x
-    line_graph.add("Today", temps)
+    line_graph.add("Temps", temps)
+    line_graph.add("UV", uvIndex, fill=False, dots_size=4, formatter=lambda x: '%s' % x)
+
 
     return line_graph.render().decode("utf-8").replace("&amp;","&")
     
@@ -311,7 +315,7 @@ def schedule_form():
 @app.route('/schedule/delete', methods=['POST'])
 def schedule_delete():
     if 'id' in request.form:
-        thermCursor.execute('DELETE FROM schedule WHERE id = (?)', (request.form['id'],))
+        thermCursor.execute('DELETE FROM schedule WHERE id = (?)',request.form['id'])
         thermConn.commit()
         reloadDaemon()
     return redirect(url_for('schedule_form'))

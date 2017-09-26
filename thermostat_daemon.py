@@ -316,7 +316,7 @@ class ThermOSDaemon(object):
                     forecast = forecastio.load_forecast(self.config['api_key'], 
                                                         self.config['latitude'], 
                                                         self.config['longitude'], 
-                                                        units = "us" if self.config['units'] == 'F' else "si")
+                                                        units = ("us" if self.config['units'] == 'F' else "si")) 
                                                                                                     
                     hourly = forecast.hourly()
                     hours = []
@@ -332,11 +332,12 @@ class ThermOSDaemon(object):
                                         data.cloudCover, 
                                         data.humidity, 
                                         data.precipProbability, 
-                                        precipType))
+                                        precipType,
+										data.uvIndex))
                     
                     # keep weather data for a month
                     self.logsCursor.execute("DELETE FROM hourlyWeather where date NOT IN (SELECT date from hourlyWeather ORDER BY date DESC LIMIT 750)")
-                    self.logsCursor.executemany("INSERT OR REPLACE INTO hourlyWeather VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", hours)
+                    self.logsCursor.executemany("INSERT OR REPLACE INTO hourlyWeather VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", hours)
                     self.logsConn.commit()
                     
                     daily = forecast.daily()

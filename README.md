@@ -3,36 +3,9 @@
 ## Setup
 ### [`Check out the full setup instructions here`](https://mholgatem.github.io/ThermOS/setup)
 
-### -INSTALLATION-
-On a fresh Raspbian Jessie image (full or lite)<br>
-
-```
-cd ~  
-git clone https://github.com/mholgatem/ThermOS  
-cd ~/ThermOS  
-sudo bash install.sh
-```
-On a computer or smartphone, ***navigate to the ip address of your raspberry pi to finish setup***.
-
-### -UPDATER-
-There is an included update script that can pull updates directly from this repository. <br>The updater will first make a backup of your current ThermOS install to **/home/pi/thermos_backup/date**
-
-To use:
-
-```
-cd ~/ThermOS
-bash update.sh
-```
-All of your settings will be preserved between updates. If you really messed something up, you can do a **hard reset** to get back to a 'factory install' state simply by running the script like this:
-
-```
-cd ~/ThermOS
-bash update.sh --hard
-```
-
-### -DS18B20-
 This thermostat requires the use of a **DS18B20** temperature sensor. **An alternative sensor can be used, but the getIndoorTemp.py file will need to be modified to gather and return the correct data.** I may at some point add the option to use a DHT-22 (combo temp/humidity sensor); but this is adequate for now. 
 
+### -DS18B20-
 Your ***DATA*** line needs to be connected to your ***VDD/POWER*** line with a ***4.7K ohm resistor***<br>
 Then do the following:<br>
 ***DATA* on gpio 4 (*physical pin 7*)<br>
@@ -47,6 +20,17 @@ to **/boot/config.txt**<br>
 by using an up-to-date **raspi-config** (Advanced Options -> 1-Wire)
 
 Reboot and your temperature sensor is good to go.
+
+### -SOFTWARE-
+On a fresh Raspbian Jessie image (full or lite)<br>
+
+```
+cd ~  
+git clone https://github.com/mholgatem/ThermOS  
+cd ~/ThermOS  
+sudo bash install.sh
+```
+On a computer or smartphone, ***navigate to the ip address of your raspberry pi to finish setup***.
 
 ## Credits
 ThermOS started life as [Rubustat by Wyatt Winters](https://github.com/wywin/Rubustat) and quickly took on a life of it's own; but there are still a few bits of code left over from those early days.
