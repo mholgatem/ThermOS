@@ -119,6 +119,13 @@ class Calendar(object):
                 "target_cool": entry.target_cool
                 }
     
+    def systemOffSoon(self, minutes = 30):
+        future = datetime.now() + timedelta(minutes=minutes)
+        status = self.getStatus( future )
+        if status['systemOn']:
+                return False
+        return True
+    
     def getStatus(self, now = None):
         ''' returns:
             systemOn (bool) - should system be on right now?

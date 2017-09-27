@@ -9,7 +9,7 @@ import pygal
 import RPi.GPIO as GPIO
 
 import scheduler
-from getIndoorTemp import getIndoorTemp
+import tempSensor
 
 '''  INITIALIZE THERMOSTAT-WEB  '''
 ''''''''''''''''''''''''''''''''''''
@@ -762,7 +762,7 @@ def info_form():
                     .replace('target-heat"', 'target-heat" style="display:inline-block;width: 135px;"')
                     .replace('target-cool"', 'target-cool" style="display:inline-block;width: 135px;"'))
     options = [{'system Time': datetime.now().strftime('%I:%M %p %A, %B %d')},
-                {'temp': str(round(getIndoorTemp(CONFIG['units'], CONFIG['temperature_offset']),1))},
+                {'temp': str(round(tempSensor.getCurrent(CONFIG['units'], CONFIG['temperature_offset']),1))},
                 {'Mode': status['mode']},
                 {'Fan Mode': status['fan_mode']},
                 {'GPIO Status': getWhatsOn()},
@@ -793,7 +793,7 @@ def liveUpdate():
             </div>'.format( fanMode = status['fan_mode'],
                             systemMode = status['mode'],
                             holdTime = calendar.getRemainingHoldTime(),
-                            temp = str(round(getIndoorTemp(CONFIG['units'], CONFIG['temperature_offset']),1)),
+                            temp = str(round(tempSensor.getCurrent(CONFIG['units'], CONFIG['temperature_offset']),1)),
                             schedule = schedule,
                             currentWeather = getCurrentWeather(),
                             alerts = getCurrentWeatherAlerts(),

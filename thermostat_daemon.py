@@ -12,9 +12,9 @@ import sys
 import time
 
 import forecastio
-from getIndoorTemp import getIndoorTemp
+import tempSensor
 
-__version__ = 2.26
+__version__ = 2.3
 
 # set working directory to where "thermos_daemon.py" is
 abspath = os.path.abspath(__file__)
@@ -187,7 +187,6 @@ class ThermOSDaemon(object):
             time.sleep(30)
         return self.idle()
 
-    
     def recordDebugLog(self, msg):
         if self.config['debug'] == True:
             print('DEBUG:', msg) 
@@ -228,7 +227,7 @@ class ThermOSDaemon(object):
                                                                             "ON" if fanStatus else "OFF"))
                 self.logsConn.commit()
                 self.lastLog = datetime.now()
-                self.indoorTemp = getIndoorTemp(self.config['units'], self.config['temperature_offset'])
+                self.indoorTemp = tempSensor.getCurrent(self.config['units'], self.config['temperature_offset'])
                 if self.indoorTemp == 0: #exactly 0 means error
                     self.sendErrorMail("There is a problem reading the temperature sensor!", frequency = timedelta(hours=6))
         except:
@@ -388,40 +387,45 @@ class ThermOSDaemon(object):
         # error checking
         if not self.status:
             return 'OFF'
-        else:
-            if (self.status['mode'] == 'AUTO' or 
-                self.schedule['target_heat'] == 'HOLD' or self.schedule['target_cool'] == 'HOLD'):
-                if self.schedule['systemOn']:
-                    # AUTO COOL
-                    if type(self.schedule['target_cool']) in [int, float] :
-                        if self.indoorTemp >= self.schedule['target_cool'] - self.config['active_hysteresis']:
-                            self.activeTarget = self.schedule['target_cool'] - self.config['active_hysteresis']
-                            self.inactiveTarget = self.schedule['target_cool'] + self.config['inactive_hysteresis']
-                            return "COOL"
-                    # AUTO HEAT
-                    if type(self.schedule['target_heat']) in [int, float]:
-                        if self.indoorTemp <= self.schedule['target_heat'] + self.config['active_hysteresis']:
-                            self.activeTarget = self.schedule['target_heat'] + self.config['active_hysteresis']
-                            self.inactiveTarget = self.schedule['target_heat'] - self.config['inactive_hysteresis']
-                            return "HEAT"
-                # AUTO OFF
-                elif not self.schedule['systemOn']:
+
+        if (self.status['mode'] == 'AUTO' or 
+            self.schedule['target_heat'] == 'HOLD' or self.schedule['target_cool'] == 'HOLD'):
+            if self.schedule['systemOn']:
+            
+                # don't turn on if only 9 minutes left
+                if self.thermostatMode == "OFF" and self.calendar.systemOffSoon(minutes=9):
                     return "OFF"
-            else:
-                # MANUAL COOL
-                if self.status['mode'] == 'COOL':
-                    if self.indoorTemp >= self.status['target_cool'] - self.config['active_hysteresis']:
-                        self.activeTarget = self.status['target_cool'] - self.config['active_hysteresis']
-                        self.inactiveTarget = self.status['target_cool'] + self.config['inactive_hysteresis']
+
+                # AUTO COOL
+                if type(self.schedule['target_cool']) in [int, float] :
+                    if self.indoorTemp >= self.schedule['target_cool'] - self.config['active_hysteresis']:
+                        self.activeTarget = self.schedule['target_cool'] - self.config['active_hysteresis']
+                        self.inactiveTarget = self.schedule['target_cool'] + self.config['inactive_hysteresis']
                         return "COOL"
-                # MANUAL HEAT
-                if self.status['mode'] == 'HEAT':
-                    if self.indoorTemp <= self.status['target_heat'] + self.config['active_hysteresis']:
-                        self.activeTarget = self.status['target_heat'] + self.config['active_hysteresis']
-                        self.inactiveTarget = self.status['target_heat'] - self.config['inactive_hysteresis']
+                # AUTO HEAT
+                if type(self.schedule['target_heat']) in [int, float]:
+                    if self.indoorTemp <= self.schedule['target_heat'] + self.config['active_hysteresis']:
+                        self.activeTarget = self.schedule['target_heat'] + self.config['active_hysteresis']
+                        self.inactiveTarget = self.schedule['target_heat'] - self.config['inactive_hysteresis']
                         return "HEAT"
-                if self.status['mode'] == 'OFF':
-                    return "OFF"
+            # AUTO OFF
+            elif not self.schedule['systemOn']:
+                return "OFF"
+        else:
+            # MANUAL COOL
+            if self.status['mode'] == 'COOL':
+                if self.indoorTemp >= self.status['target_cool'] - self.config['active_hysteresis']:
+                    self.activeTarget = self.status['target_cool'] - self.config['active_hysteresis']
+                    self.inactiveTarget = self.status['target_cool'] + self.config['inactive_hysteresis']
+                    return "COOL"
+            # MANUAL HEAT
+            if self.status['mode'] == 'HEAT':
+                if self.indoorTemp <= self.status['target_heat'] + self.config['active_hysteresis']:
+                    self.activeTarget = self.status['target_heat'] + self.config['active_hysteresis']
+                    self.inactiveTarget = self.status['target_heat'] - self.config['inactive_hysteresis']
+                    return "HEAT"
+            if self.status['mode'] == 'OFF':
+                return "OFF"
                 
         return "OFF"
         
@@ -435,21 +439,25 @@ class ThermOSDaemon(object):
         self.inactiveTarget = 0
         while True:
             
-            self.indoorTemp = getIndoorTemp(self.config['units'], self.config['temperature_offset'])
+            self.indoorTemp = tempSensor.getCurrent(self.config['units'], self.config['temperature_offset'])
             self.schedule = self.calendar.getStatus()
             self.thermostatMode = self.getMode()
             hvacState = self.getHVACState()
 
             if not self.inPassiveMode:
+				#set cool or heat
                 if self.thermostatMode == "COOL": self.cool()
                 if self.thermostatMode == "HEAT": self.heat()
-
+				
+				#check if temp target reached + powerdown
                 if (self.thermostatMode == "OFF" or
                     self.thermostatMode == "COOL" and self.indoorTemp <= self.activeTarget or
                     self.thermostatMode == "HEAT" and self.indoorTemp >= self.activeTarget):
                     self.inPassiveMode = True
                     self.powerDown()
             else:
+				#check if time to turn back on
+                
                 if (self.thermostatMode == "COOL" and self.indoorTemp > self.inactiveTarget or
                     self.thermostatMode == "HEAT" and self.indoorTemp < self.inactiveTarget):
                     self.inPassiveMode = False

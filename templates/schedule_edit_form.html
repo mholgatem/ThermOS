@@ -89,7 +89,7 @@
                         <div class="styled-select blue semi-square" style="margin: 0 auto; text-align: center;">
                                 <select class="styled-select blue semi-square" name="timeFrame">
                                     {% for option in ['DATE', 'MONDAYS', 'TUESDAYS', 'WEDNESDAYS', 'THURSDAYS', 'FRIDAYS', 'SATURDAYS', 'SUNDAYS', 'WEEKDAYS', 'WEEKENDS', 'ALWAYS'] %}
-                                        <option value="{{ option }}" {% if option is equalto entry.date %}selected{% endif %}>{{ option }}</option>
+                                        <option value="{{ option }}" {% if option is equalto (entry.date) %}selected{% endif %}>{{ option }}</option>
                                     {% endfor %}
                                     </select>
                         </div>
