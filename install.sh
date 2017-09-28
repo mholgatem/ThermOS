@@ -42,8 +42,6 @@ sudo systemctl daemon-reload
 sudo systemctl start thermostat-daemon
 sudo systemctl start thermostat-web
 
-chmod 755 $SCRIPTPATH/update.sh
-
 echo
 echo
 echo "-----------------"
