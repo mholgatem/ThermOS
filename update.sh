@@ -1,5 +1,6 @@
 set -o errexit
 
+VERSION="1.1"
 SELF=$(basename $0)
 UPDATE_BASE=https://raw.githubusercontent.com/mholgatem/ThermOS/master
 
