@@ -27,4 +27,9 @@ if ! [[ "$1" == "-noupdate" ]]; then
     exec /bin/bash update.sh -noupdate
 fi
 
+sudo systemctl stop thermostat-daemon
+sudo systemctl stop thermostat-web
+sudo systemctl daemon-reload
+sudo systemctl start thermostat-daemon
+sudo systemctl start thermostat-web
 echo 'complete'
