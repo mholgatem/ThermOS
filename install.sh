@@ -9,7 +9,7 @@ cd $SCRIPTPATH
 #if not root user, restart script as root
 if [ "$(whoami)" != "root" ]; then
 	echo "Switching to root user..."
-	sudo bash $SCRIPT
+	sudo bash $SCRIPT $*
 	exit 1
 fi
 
