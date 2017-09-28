@@ -1,9 +1,21 @@
-VERSION="1.0"
+#!/bin/bash
+VERSION="1.2"
+
+#get script path
+SCRIPT=$(readlink -f $0)
+SCRIPTPATH=`dirname $SCRIPT`
+cd $SCRIPTPATH
+
+#if not root user, restart script as root
+if [ "$(whoami)" != "root" ]; then
+	echo "Switching to root user..."
+	sudo bash $SCRIPT $*
+	exit 1
+fi
 
 shopt -s nocasematch
-
-echo "Performing self-update..."
 if ! [[ "$1" == "-noupdate" ]]; then
+    echo "Performing self-update..."
     git config --global user.email "none@none.com"
     git config --global user.name "none@none.com"
     git checkout master
