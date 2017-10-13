@@ -47,6 +47,6 @@ def getCurrent(units, offset = 0.0, serial = '28*'):
 			else:
 				return float(avgTemp) + offset
 		
-		return None
+		return -666
 	except:
-		return None
+		return -666
