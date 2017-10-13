@@ -228,7 +228,7 @@ class ThermOSDaemon(object):
                 self.logsConn.commit()
                 self.lastLog = datetime.now()
                 self.indoorTemp = tempSensor.getCurrent(self.config['units'], self.config['temperature_offset'])
-                if self.indoorTemp == 0: #exactly 0 means error
+                if self.indoorTemp == -666: #exactly 0 means error
                     self.sendErrorMail("There is a problem reading the temperature sensor!", frequency = timedelta(hours=6))
         except:
             print("Error while saving log data: ", sys.exc_info()[0])
