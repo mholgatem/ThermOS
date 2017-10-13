@@ -31,6 +31,9 @@ echo
 sudo apt-get -y install python-pip python-dev sqlite3
 sudo pip install flask gunicorn pygal python-forecastio
 
+#Add uvIndex to logs.db -> hourlyWeather table
+sqlite3 $SCRIPTPATH/logs/logs.db "ALTER TABLE hourlyWeather ADD COLUMN uvIndex NUMERIC"
+
 #copy service unit files for systemctl
 daemon=$SCRIPTPATH"/thermostat-daemon.service"
 web=$SCRIPTPATH"/thermostat-web.service"
