@@ -28,7 +28,7 @@ echo
 echo "Installing Dependencies..."
 echo
 
-sudo apt-get -y install python-pip python-dev sqlite3
+sudo apt-get -y install python-pip python-dev sqlite3 nginx
 sudo pip install flask gunicorn pygal python-forecastio
 
 #Add uvIndex to logs.db -> hourlyWeather table
