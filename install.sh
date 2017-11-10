@@ -31,6 +31,12 @@ echo
 sudo apt-get -y install python-pip python-dev sqlite3 nginx
 sudo pip install flask gunicorn pygal python-forecastio
 
+#create nginx server
+sudo cp $SCRIPTPATH"/nginx-thermos" /etc/nginx/sites-available/ThermOS
+sudo ln -s /etc/nginx/sites-available/ThermOS /etc/nginx/sites-enabled/
+
+sudo cp $SCRIPTPATH"/nginx.conf" /etc/nginx/nginx.conf
+
 #Add uvIndex to logs.db -> hourlyWeather table
 sqlite3 $SCRIPTPATH/logs/logs.db "ALTER TABLE hourlyWeather ADD COLUMN uvIndex NUMERIC"
 
@@ -44,6 +50,7 @@ sudo systemctl enable thermostat-web
 sudo systemctl daemon-reload
 sudo systemctl start thermostat-daemon
 sudo systemctl start thermostat-web
+sudo service nginx restart
 
 echo
 echo

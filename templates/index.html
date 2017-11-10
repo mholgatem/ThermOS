@@ -5,12 +5,13 @@
     <title>Thermostat</title>
     
     <!-- Bootstrap core CSS -->
-    <link href="/static/css/jquery.mobile-1.4.5.css" rel="stylesheet">
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/jquery.mobile-1.4.5.css" rel="stylesheet" media="none" onload="if(media!='all')media='all'">
+	<link rel="stylesheet" href="/static/css/bootstrap.css" media="none" onload="if(media!='all')media='all'">
+	<noscript><link href="/static/css/bootstrap.css" rel="stylesheet" media="none"></noscript>
     <link href="/static/css/main.css" rel="stylesheet">
 
-    <script type='application/javascript' src="/static/fastclick.js"></script>
-    <script type='application/javascript' src="/static/jquery.min.js"></script>
+    <script type='application/javascript' src="/static/fastclick.js" defer></script>
+    <script type='application/javascript' src="/static/jquery.min.js" async></script>
     
     <script>
         $(document).on("mobileinit", function () {
@@ -20,7 +21,7 @@
             $.mobile.changePage.defaults.changeHash = false;
         });
     </script>
-    <script type='application/javascript' src="/static/jquery.mobile-1.4.5.min.js"></script>
+    <script type='application/javascript' src="/static/jquery.mobile-1.4.5.min.js" async></script>
 
     <script type="application/javascript">
     // popup examples

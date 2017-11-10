@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/home/pi/ThermOS
-ExecStart=/usr/local/bin/gunicorn thermostat_web:app -b 0.0.0.0:80
+ExecStart=/usr/local/bin/gunicorn thermostat_web:app --bind unix:/home/pi/ThermOS/thermos.sock --workers 4
 Restart=always
 
 [Install]
