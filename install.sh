@@ -34,6 +34,7 @@ sudo pip install flask gunicorn pygal python-forecastio
 #create nginx server
 sudo cp $SCRIPTPATH"/nginx-thermos" /etc/nginx/sites-available/ThermOS
 sudo ln -s /etc/nginx/sites-available/ThermOS /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
 
 sudo cp $SCRIPTPATH"/nginx.conf" /etc/nginx/nginx.conf
 
