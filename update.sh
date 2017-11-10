@@ -50,7 +50,7 @@ case $OLD_VERSION in
 		sudo cp $web /lib/systemd/system/
         ;&
 	"DONE")
-		wget https://raw.githubusercontent.com/mholgatem/ThermOS/master/version
+		wget -O version https://raw.githubusercontent.com/mholgatem/ThermOS/master/version
 		echo "Finished Updating...Restarting services."
 		;;
 	*)
