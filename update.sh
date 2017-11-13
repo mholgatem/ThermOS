@@ -40,6 +40,8 @@ case $OLD_VERSION in
 		UPDATE_VERSION=1.3
 		echo $UPDATE_VERSION > version
         echo "Handling v1.3 updates..."
+		#Add uvIndex to logs.db -> hourlyWeather table
+		sqlite3 $SCRIPTPATH/logs/logs.db "ALTER TABLE hourlyWeather ADD COLUMN uvIndex NUMERIC"
 		sudo apt-get -y install nginx
 		#create nginx server
 		sudo cp $SCRIPTPATH"/nginx-thermos" /etc/nginx/sites-available/ThermOS

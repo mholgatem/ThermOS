@@ -196,14 +196,9 @@ class Calendar(object):
                                     "target_cool": entry["target_cool"],
                                     "on": entry["on"].time().strftime("%I:%M %p"),
                                     "off": entry["off"].time().strftime("%I:%M %p")}
-
-        return "<div id=\"scheduleEntry\"><small>{0}</small> <b>{1}-{2}</b></div> \
-                <div id=\"targetTemps\"><div id=\"target-heat\">{3}</div> \
-                <div id=\"target-cool\">{4}</div></div>".format(systemStatus["title"],
-                                                            systemStatus["on"].lstrip("0"),
-                                                            systemStatus["off"].lstrip("0"),
-                                                            systemStatus["target_heat"],
-                                                            systemStatus["target_cool"],)
+		
+        return ["<div id=\"scheduleEntry\"><small>{0}</small> <b>{1}-{2}</b></div>".format(systemStatus["title"], systemStatus["on"].lstrip("0"), systemStatus["off"].lstrip("0")),
+                "<div id=\"targetTemps\"><div id=\"target-heat\">{0}</div><div id=\"target-cool\">{1}</div></div>".format(systemStatus["target_heat"], systemStatus["target_cool"])]
         
     def nextScheduledRuntime(self):
         # make sure calendar is up to date

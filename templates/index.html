@@ -2,15 +2,15 @@
 <head>
     <meta text/html;charset="utf-8">
     <link rel="shortcut icon" href="/static/images/favicon.png">
-    <title>Thermostat</title>
+    <title>{{ title }}</title>
     
     <!-- Bootstrap core CSS -->
-    <link href="/static/css/jquery.mobile-1.4.5.css" rel="stylesheet" media="none" onload="if(media!='all')media='all'">
-	<link rel="stylesheet" href="/static/css/bootstrap.css" media="none" onload="if(media!='all')media='all'">
+    <link href="/static/css/jquery.mobile-1.4.5.css" rel="stylesheet">
+	<link rel="stylesheet" href="/static/css/bootstrap.css">
 	<noscript><link href="/static/css/bootstrap.css" rel="stylesheet" media="none"></noscript>
     <link href="/static/css/main.css" rel="stylesheet">
 
-    <script type='application/javascript' src="/static/fastclick.js"></script>
+    <script type='application/javascript' src="/static/fastclick.js" defer></script>
     <script type='application/javascript' src="/static/jquery.min.js"></script>
     
     <script>
@@ -21,7 +21,7 @@
             $.mobile.changePage.defaults.changeHash = false;
         });
     </script>
-    <script type='application/javascript' src="/static/jquery.mobile-1.4.5.min.js"></script>
+    <script type='application/javascript' src="/static/jquery.mobile.custom.min.js"></script>
 
     <script type="application/javascript">
     // popup examples
@@ -74,6 +74,71 @@
          Refreshes every 5 seconds -->
 
 
+
+    
+    <script>
+        function init() {
+            //liveUpdate();
+            {{ openSettings|safe }}
+        };
+    </script>
+</head>
+
+<body class="main-form" onload="init();">
+
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav pager">
+            <li class="modern embossed-link"><a id="fan-btn" data-src="/fan"><img src="static/images/fan-small.png"><label id="fanStatus">{{ fanStatus }}</label></a></li>
+            <li class="modern embossed-link"><a id="system-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/system"><img src="static/images/system-small.png"><label id="systemStatus">{{ systemMode }}</label></a></li>
+            <li class="modern embossed-link"><a id="schedule-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/schedule"><img src="static/images/schedule-small.png"></a></li>
+            <li class="modern embossed-link"><a id="hold-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/hold"><img src="static/images/hold-small.png"><label id="holdTime">{{ holdTime }}</label></a></li>
+            <li class="modern embossed-link"><a id="settings-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/settings"><img src="static/images/settings-small.png"></a></li>
+            <li class="modern embossed-link"><a id="logs-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/_daemonLogs"><img src="static/images/logs-small.png"></a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div data-role="popup" id="popupPanel" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
+        <a href="#" data-rel="back" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right close">Close</a>
+        <iframe id="popupFrame" src="about:blank" width="auto" height="auto" seamless=""></iframe>
+    </div>
+    
+    <div id="content">
+        <div id="container1">
+            <div>
+                <p id="indoorLabel">INDOOR</p>
+                    <p id="currentTemp"><span class="unit-{{ unit }}" id="indoorTempSpan">{{ temp }}</span></p>
+                    <div id="currentSchedule">
+                        {{ targetTemps }}
+                    </div>
+            </div>
+            
+        </div>
+        <div class={{ weatherVisible }} id="container2">
+            <div>
+                <p id="outdoorLabel">OUTDOOR</p>
+                <a href="/forecast" data-ajax="false"><div id="outdoorTempContainer">{{ currentWeather }}</div></a>
+                <span id="currentScheduleSpan"></span>
+            </div>
+        </div>
+            <div class="push"></div>
+    </div>
+    
+    <div id="footer">
+        <marquee id="footerAlerts">{{ alerts|safe }}</marquee>
+        <span id="currentTime">{{ time }}</span>
+        <span id="scheduledRun">{{ scheduleTime }}</span>
+    </div>
+</body>
+<script>
+$(".button-popup").click(function(){
+    var iframe = $( "#popupPanel iframe" );
+    iframe.attr("src", $(this).data("src")); 
+});
+</script>
     <script>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
         $(function() {
@@ -129,7 +194,7 @@
                 $('#footerAlerts').html($(result).find('#weatherAlerts').html());
                 $('#scheduledRun').html($(result).find('#scheduleEntry').html());
                 $('#currentTime').html($(result).find('#timeContainer').html());
-                $('title').html('Currently ' + $(result).find('#indoorTempContainer').html() + '&deg;');
+                $('title').html($(result).find('#indoorTempContainer').html() + '&deg;');
                 /*$('#schedule').html($(result).find('#updateTemp').html());*/
             }
         })
@@ -139,70 +204,3 @@
       liveUpdate()
     }, 5000);
     </script>
-    
-    <script>
-        function init() {
-            liveUpdate();
-            {{ openSettings|safe }}
-        };
-    </script>
-</head>
-
-<body class="main-form" onload="init();">
-
-    <div class="navbar navbar-inverse" role="navigation">
-      <div class="container">
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav pager">
-            <li class="modern embossed-link"><a id="fan-btn" data-src="/fan"><img src="static/images/fan-small.png"><label id="fanStatus">{{ fanStatus }}</label></a></li>
-            <li class="modern embossed-link"><a id="system-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/system"><img src="static/images/system-small.png"><label id="systemStatus">{{ systemStatus }}</label></a></li>
-            <li class="modern embossed-link"><a id="schedule-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/schedule"><img src="static/images/schedule-small.png"></a></li>
-            <li class="modern embossed-link"><a id="hold-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/hold"><img src="static/images/hold-small.png"><label id="holdTime">{{ holdTime }}</label></a></li>
-            <li class="modern embossed-link"><a id="settings-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/settings"><img src="static/images/settings-small.png"></a></li>
-            <li class="modern embossed-link"><a id="logs-btn" class="button-popup" href="#popupPanel" data-rel="popup" data-position-to="window" data-src="/_daemonLogs"><img src="static/images/logs-small.png"></a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
-
-    <div data-role="popup" id="popupPanel" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
-        <a href="#" data-rel="back" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right close">Close</a>
-        <iframe id="popupFrame" src="about:blank" width="auto" height="auto" seamless=""></iframe>
-    </div>
-    
-    <div id="content">
-        <div id="container1">
-            <div>
-                <p id="indoorLabel">INDOOR</p>
-                    <p id="currentTemp"><span class="unit-{{ unit }}" id="indoorTempSpan"></span></p>
-                    <div id="currentSchedule">
-                        <div id="targetTemps">
-                          <div id="targetHeat"></div>
-                          <div id="targetCool"></div>
-                        </div>
-                    </div>
-            </div>
-            
-        </div>
-        <div class={{ weatherVisible }} id="container2">
-            <div>
-                <p id="outdoorLabel">OUTDOOR</p>
-                <a href="/forecast" data-ajax="false"><div id="outdoorTempContainer"></div></a>
-                <span id="currentScheduleSpan"></span>
-            </div>
-        </div>
-            <div class="push"></div>
-    </div>
-    
-    <div id="footer">
-        <marquee id="footerAlerts">{{ alerts|safe }}</marquee>
-        <span id="currentTime"></span>
-        <span id="scheduledRun"></span>
-    </div>
-</body>
-<script>
-$(".button-popup").click(function(){
-    var iframe = $( "#popupPanel iframe" );
-    iframe.attr("src", $(this).data("src")); 
-});
-</script>
