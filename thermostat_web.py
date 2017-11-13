@@ -269,7 +269,7 @@ def getModeHTML(status):
     elif status['mode'] == 'HEAT':
         mode = ['<div id="targetTemps"><div id="target-heat">{0}</div></div>'.format(status['target_heat'])]
     else:
-        mode = ''
+        mode = ['']
     return ['<div id="scheduleEntry"></div>'] + mode
 	
 def reloadDaemon():
