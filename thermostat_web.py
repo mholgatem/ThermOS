@@ -152,10 +152,10 @@ def getCurrentWeather():
 									<span id="humidityLabel">Humidity</span> \
 								</p>'.format(hourly['humidity'] * 100)
 			
-			html = '<div id="currentWeather">{0}{1}{2}</div>'.format(currentTemp, currentIcon, currentHumidity)
+			html = '{0}{1}{2}'.format(currentTemp, currentIcon, currentHumidity)
 			return html.decode("utf-8").replace("&amp;","&")
 			
-		return '<div id="currentWeather"><span style="font-size:60px;">Weather not yet populated</span></div>'
+		return '<span style="font-size:60px;">Weather not yet populated</span>'
 
 		
 def getDailyWeather():
@@ -812,7 +812,7 @@ def liveUpdate():
 							holdTime = calendar.getRemainingHoldTime(),
 							temp = temp,
 							schedule = schedule,
-							currentWeather = getCurrentWeather(),
+							currentWeather = '<div id="currentWeather">{0}</div>'.format(getCurrentWeather()),
 							alerts = getCurrentWeatherAlerts(),
 							time = datetime.now().strftime('<b>%I:%M</b><small>%p %A, %B %d</small>')
 							)
