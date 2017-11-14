@@ -1,0 +1,1338 @@
+/*!
+* jQuery Mobile 1.4.5
+* Git HEAD hash: 68e55e78b292634d3991c795f06f5e37a512decc <> Date: Fri Oct 31 2014 17:33:30 UTC
+* http://jquerymobile.com
+*
+* Copyright 2010, 2014 jQuery Foundation, Inc. and othercontributors
+* Released under the MIT license.
+* http://jquery.org/license
+*
+*/
+
+
+/* SVG icons */
+.ui-icon-delete:after {
+	background-image: url("data:image/svg+xml;charset=US-ASCII,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22iso-8859-1%22%3F%3E%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%20%20width%3D%2214px%22%20height%3D%2214px%22%20viewBox%3D%220%200%2014%2014%22%20style%3D%22enable-background%3Anew%200%200%2014%2014%3B%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpolygon%20fill%3D%22%23FFF%22%20points%3D%2214%2C3%2011%2C0%207%2C4%203%2C0%200%2C3%204%2C7%200%2C11%203%2C14%207%2C10%2011%2C14%2014%2C11%2010%2C7%20%22%2F%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+/* Alt icons */
+/* PNG icons */
+/* Alt icons */
+/* Globals */
+/* Font
+-----------------------------------------------------------------------------------------------------------*/
+html {
+	font-size: 100%;
+}
+body,
+input,
+select,
+textarea,
+button,
+.ui-btn {
+	font-size: 1em;
+	line-height: 1.3;
+	font-family: sans-serif /*{global-font-family}*/;
+}
+legend,
+ {
+	color: inherit;
+	text-shadow: inherit;
+}
+/* Form labels (overrides font-weight bold in bars, and mini font-size) */
+.ui-mobile label,
+ {
+	font-weight: normal;
+	font-size: 16px;
+}
+
+/* Page and overlay */
+.ui-overlay-a,
+.ui-page-theme-a,
+.ui-page-theme-a .ui-panel-wrapper {
+	border-color:	 		#bbb /*{a-page-border}*/;
+	color: 					#333 /*{a-page-color}*/;
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#b5d0e5+0,2989d8+50,1e5799+100 */
+background: rgb(181,208,229); /* Old browsers */
+background: -moz-linear-gradient(45deg,  rgba(181,208,229,1) 0%, rgba(41,137,216,1) 50%, rgba(30,87,153,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(45deg,  rgba(181,208,229,1) 0%,rgba(41,137,216,1) 50%,rgba(30,87,153,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(45deg,  rgba(181,208,229,1) 0%,rgba(41,137,216,1) 50%,rgba(30,87,153,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5d0e5', endColorstr='#1e5799',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+/* Separators
+-----------------------------------------------------------------------------------------------------------*/
+/* Field contain separator (< 28em) */
+/* Table opt-in classes: strokes between each row, and alternating row stripes */
+/* Classes table-stroke and table-stripe are deprecated in 1.4. */
+/* Buttons
+-----------------------------------------------------------------------------------------------------------*/
+.ui-btn,
+ {
+	font-weight: bold;
+	border-width: 1px;
+	border-style: solid;
+}
+.ui-btn {
+	text-decoration: none !important;
+}
+.ui-btn-active {
+	cursor: pointer;
+}
+
+/* Button up */
+.ui-page-theme-b .ui-btn,
+html .ui-bar-b .ui-btn,
+html .ui-body-b .ui-btn,
+html body .ui-group-theme-b .ui-btn,
+html head + body .ui-btn.ui-btn-b,
+/* Button visited */
+.ui-page-theme-b .ui-btn:visited,
+html .ui-bar-b .ui-btn:visited,
+html .ui-body-b .ui-btn:visited,
+html body .ui-group-theme-b .ui-btn:visited,
+html head + body .ui-btn.ui-btn-b:visited {
+	background-color: 			#333 /*{b-bup-background-color}*/;
+	border-color:	 		#1f1f1f /*{b-bup-border}*/;
+	color: 					#fff /*{b-bup-color}*/;
+	text-shadow: 0 /*{b-bup-shadow-x}*/ 1px /*{b-bup-shadow-y}*/ 0 /*{b-bup-shadow-radius}*/ #111 /*{b-bup-shadow-color}*/;
+}
+.ui-btn-icon-notext,
+.ui-header button.ui-btn.ui-btn-icon-notext,
+.ui-footer button.ui-btn.ui-btn-icon-notext {
+	padding: 0;
+	width: 1.75vw;
+	height: 1.75vw;
+	text-indent: -9999px;
+	white-space: nowrap !important;
+}
+.ui-popup > .close {
+    font-size: 10px !important;
+}
+.ui-btn-icon-notext:after, .ui-btn-icon-top:after, .ui-btn-icon-bottom:after {
+    left: 50%;
+    margin-left: -11px;
+}
+.ui-btn-icon-notext:after, .ui-btn-icon-left:after, .ui-btn-icon-right:after {
+    top: 50%;
+    margin-top: -11px;
+}
+/* Corner rounding
+-----------------------------------------------------------------------------------------------------------*/
+/* Class ui-btn-corner-all deprecated in 1.4 */
+.ui-corner-all {
+	-webkit-border-radius: 				.3125em /*{global-radii-blocks}*/;
+	border-radius: 						.3125em /*{global-radii-blocks}*/;
+}
+/* Buttons */
+.ui-btn-corner-all,
+.ui-btn.ui-corner-all,
+/* Slider track */
+.ui-slider-track.ui-corner-all,
+/* Flipswitch */
+.ui-flipswitch.ui-corner-all,
+/* Count bubble */
+.ui-li-count {
+	-webkit-border-radius: 				.3125em /*{global-radii-buttons}*/;
+	border-radius: 						.3125em /*{global-radii-buttons}*/;
+}
+/* Icon-only buttons */
+.ui-btn-icon-notext.ui-btn-corner-all,
+.ui-btn-icon-notext.ui-corner-all {
+	-webkit-border-radius: 1em;
+	border-radius: 1em;
+}
+/* Radius clip workaround for cleaning up corner trapping */
+.ui-btn-corner-all,
+.ui-corner-all {
+	-webkit-background-clip: padding;
+	background-clip: padding-box;
+}
+/* Popup arrow */
+.ui-popup.ui-corner-all > .ui-popup-arrow-guide {
+	left: .6em /*{global-radii-blocks}*/;
+	right: .6em /*{global-radii-blocks}*/;
+	top: .6em /*{global-radii-blocks}*/;
+	bottom: .6em /*{global-radii-blocks}*/;
+}
+/* Shadow
+-----------------------------------------------------------------------------------------------------------*/
+.ui-shadow {
+	-webkit-box-shadow: 0 1px 3px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.15) /*{global-box-shadow-color}*/;
+	-moz-box-shadow: 0 1px 3px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.15) /*{global-box-shadow-color}*/;
+	box-shadow: 0 1px 3px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.15) /*{global-box-shadow-color}*/;
+}
+.ui-shadow-inset {
+	-webkit-box-shadow: inset 0 1px 3px /*{global-box-shadow-size}*/ 	rgba(0,0,0,.2) /*{global-box-shadow-color}*/;
+	-moz-box-shadow: inset 0 1px 3px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.2) /*{global-box-shadow-color}*/;
+	box-shadow: inset 0 1px 3px /*{global-box-shadow-size}*/ 	rgba(0,0,0,.2) /*{global-box-shadow-color}*/;
+}
+.ui-overlay-shadow {
+	-webkit-box-shadow: 0 0 12px 		rgba(0,0,0,.6);
+	-moz-box-shadow: 0 0 12px 			rgba(0,0,0,.6);
+	box-shadow: 0 0 12px 				rgba(0,0,0,.6);
+}
+/* Icons
+-----------------------------------------------------------------------------------------------------------*/
+.ui-btn-icon-left:after,
+.ui-btn-icon-right:after,
+.ui-btn-icon-top:after,
+.ui-btn-icon-bottom:after,
+.ui-btn-icon-notext:after {
+	background-color: 					#666 /*{global-icon-color}*/;
+	background-color: 					rgba(0,0,0,.3) /*{global-icon-disc}*/;
+	background-position: center center;
+	background-repeat: no-repeat;
+	-webkit-border-radius: 1em;
+	border-radius: 1em;
+}
+/* Alt icons */
+.ui-alt-icon.ui-btn:after,
+.ui-alt-icon .ui-btn:after,
+
+
+
+ {
+	background-color: 					#666 /*{global-icon-color}*/;
+	background-color: 					rgba(0,0,0,.15) /*{global-icon-disc}*/;
+}
+/* No disc */
+/* Icon shadow */
+/* Checkbox and radio */
+/* Loader */
+.ui-icon-loading {
+	background: url(../images/ajax-loader.gif);
+	background-size: 2.875em 2.875em;
+}
+/* Swatches */
+/* A
+-----------------------------------------------------------------------------------------------------------*/
+/* Bar: Toolbars, dividers, slider track */
+/* Page and overlay */
+.ui-overlay-a,
+.ui-page-theme-a,
+ {
+	border-color:	 		#bbb /*{a-page-border}*/;
+	color: 					#333 /*{a-page-color}*/;
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#b5d0e5+0,2989d8+50,1e5799+100 */
+background: rgb(181,208,229); /* Old browsers */
+background: -moz-linear-gradient(45deg,  rgba(181,208,229,1) 0%, rgba(41,137,216,1) 50%, rgba(30,87,153,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(45deg,  rgba(181,208,229,1) 0%,rgba(41,137,216,1) 50%,rgba(30,87,153,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(45deg,  rgba(181,208,229,1) 0%,rgba(41,137,216,1) 50%,rgba(30,87,153,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5d0e5', endColorstr='#1e5799',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+
+	
+}
+/* Body: Read-only lists, text inputs, collapsible content */
+.ui-body-a,
+
+
+
+
+ {
+	background-color: 			#fff /*{a-body-background-color}*/;
+	border-color:	 		#ddd /*{a-body-border}*/;
+	color: 					#333 /*{a-body-color}*/;
+	text-shadow: 0 /*{a-body-shadow-x}*/ 1px /*{a-body-shadow-y}*/ 0 /*{a-body-shadow-radius}*/ 	#f3f3f3 /*{a-body-shadow-color}*/;
+}
+.ui-body-a {
+	border-width: 1px;
+	border-style: solid;
+}
+/* Links */
+.ui-page-theme-a a,
+html .ui-body-a a,
+ {
+	color: #3388cc /*{a-link-color}*/;
+	font-weight: bold;
+}
+.ui-page-theme-a a:visited,
+html .ui-body-a a:visited,
+ {
+    color: #3388cc /*{a-link-visited}*/;
+}
+.ui-page-theme-a a:hover,
+html .ui-body-a a:hover,
+ {
+	color: #005599 /*{a-link-hover}*/;
+}
+.ui-page-theme-a a:active,
+html .ui-body-a a:active,
+ {
+	color: #005599 /*{a-link-active}*/;
+}
+/* Button up */
+.ui-page-theme-a .ui-btn,
+html .ui-body-a .ui-btn,
+html head + body .ui-btn.ui-btn-a,
+/* Button visited */
+.ui-page-theme-a .ui-btn:visited,
+html .ui-body-a .ui-btn:visited,
+html head + body .ui-btn.ui-btn-a:visited {
+	background-color: 			#f6f6f6 /*{a-bup-background-color}*/;
+	border-color:	 		#ddd /*{a-bup-border}*/;
+	color: 					#333 /*{a-bup-color}*/;
+	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #f3f3f3 /*{a-bup-shadow-color}*/;
+}
+/* Button hover */
+.ui-page-theme-a .ui-btn:hover,
+html .ui-body-a .ui-btn:hover,
+html head + body .ui-btn.ui-btn-a:hover {
+	background-color: 			#ededed /*{a-bhover-background-color}*/;
+	border-color:	 		#ddd /*{a-bhover-border}*/;
+	color: 					#333 /*{a-bhover-color}*/;
+	text-shadow: 0 /*{a-bhover-shadow-x}*/ 1px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #f3f3f3 /*{a-bhover-shadow-color}*/;
+}
+/* Button down */
+.ui-page-theme-a .ui-btn:active,
+html .ui-body-a .ui-btn:active,
+html head + body .ui-btn.ui-btn-a:active {
+	background-color: 			#e8e8e8 /*{a-bdown-background-color}*/;
+	border-color:	 		#ddd /*{a-bdown-border}*/;
+	color: 					#333 /*{a-bdown-color}*/;
+	text-shadow: 0 /*{a-bdown-shadow-x}*/ 1px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #f3f3f3 /*{a-bdown-shadow-color}*/;
+}
+/* Active button */
+/* Active radio button icon */
+/* Focus */
+.ui-page-theme-a .ui-btn:focus,
+html .ui-body-a .ui-btn:focus,
+html head + body .ui-btn.ui-btn-a:focus,
+/* Focus buttons and text inputs with div wrap */
+
+
+
+
+
+ {
+	-webkit-box-shadow: 0 0 12px 	#3388cc /*{a-active-background-color}*/;
+	-moz-box-shadow: 0 0 12px 		#3388cc /*{a-active-background-color}*/;
+	box-shadow: 0 0 12px 			#3388cc /*{a-active-background-color}*/;
+}
+/* B
+-----------------------------------------------------------------------------------------------------------*/
+/* Bar: Toolbars, dividers, slider track */
+/* Page and overlay */
+/* Body: Read-only lists, text inputs, collapsible content */
+/* Links */
+/* Button up */
+html head + body .ui-btn.ui-btn-b,
+/* Button visited */
+html head + body .ui-btn.ui-btn-b:visited {
+	background-color: 			#333 /*{b-bup-background-color}*/;
+	border-color:	 		#1f1f1f /*{b-bup-border}*/;
+	color: 					#fff /*{b-bup-color}*/;
+	text-shadow: 0 /*{b-bup-shadow-x}*/ 1px /*{b-bup-shadow-y}*/ 0 /*{b-bup-shadow-radius}*/ #111 /*{b-bup-shadow-color}*/;
+}
+/* Button hover */
+html head + body .ui-btn.ui-btn-b:hover {
+	background-color: 			#373737 /*{b-bhover-background-color}*/;
+	border-color:	 		#1f1f1f /*{b-bhover-border}*/;
+	color: 					#fff /*{b-bhover-color}*/;
+	text-shadow: 0 /*{b-bhover-shadow-x}*/ 1px /*{b-bhover-shadow-y}*/ 0 /*{b-bhover-shadow-radius}*/ #111 /*{b-bhover-shadow-color}*/;
+}
+/* Button down */
+html head + body .ui-btn.ui-btn-b:active {
+	background-color: 			#404040 /*{b-bdown-background-color}*/;
+	border-color:	 		#1f1f1f /*{b-bdown-border}*/;
+	color: 					#fff /*{b-bdown-color}*/;
+	text-shadow: 0 /*{b-bdown-shadow-x}*/ 1px /*{b-bdown-shadow-y}*/ 0 /*{b-bdown-shadow-radius}*/ #111 /*{b-bdown-shadow-color}*/;
+}
+/* Active button */
+/* Active radio button icon */
+/* Focus */
+html head + body .ui-btn.ui-btn-b:focus,
+/* Focus buttons and text inputs with div wrap */
+
+
+
+
+
+ {
+	-webkit-box-shadow: 0 0 12px 	#22aadd /*{b-active-background-color}*/;
+	-moz-box-shadow: 0 0 12px 		#22aadd /*{b-active-background-color}*/;
+	box-shadow: 0 0 12px 			#22aadd /*{b-active-background-color}*/;
+}
+/* Structure */
+/* Disabled
+-----------------------------------------------------------------------------------------------------------*/
+/* Class ui-disabled deprecated in 1.4. :disabled not supported by IE8 so we use [disabled] */
+/* Focus state outline
+-----------------------------------------------------------------------------------------------------------*/
+.ui-btn:focus,
+ {
+	outline: 0;
+}
+/* Unset box-shadow in browsers that don't do it right */
+/* Some unsets */
+.ui-mobile,
+.ui-mobile body {
+	height: 99.9%;
+}
+.ui-page {
+	padding: 0;
+	margin: 0;
+}
+.ui-mobile a img,
+ {
+	border-width: 0;
+}
+/* Fixes for fieldset issues on IE10 and FF (see #6077) */
+@-moz-document url-prefix() {
+	.ui-mobile fieldset {
+		display: table-column;
+		vertical-align: middle;
+	}
+}
+/* Viewport */
+.ui-mobile-viewport {
+	margin: 0;
+	overflow-x: visible;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust:none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+/* Issue #2066 */
+body.ui-mobile-viewport,
+ {
+	overflow-x: hidden;
+}
+/* "page" containers - full-screen views, one should always be in view post-pageload */
+.ui-mobile [data-role=page],
+.ui-page {
+	top: 0;
+	left: 0;
+	width: 100%;
+	min-height: 100%;
+	position: absolute;
+	display: none;
+	border: 0;
+}
+/* On ios4, setting focus on the page element causes flashing during transitions when there is an outline, so we turn off outlines */
+.ui-page {
+	outline: none;
+    height: 100%;
+}
+.ui-mobile .ui-page-active {
+	display: block;
+	overflow: visible;
+	overflow-x: hidden;
+}
+@media screen and (orientation: portrait) {
+	.ui-mobile .ui-page {
+		min-height: 420px;
+	}
+}
+@media screen and (orientation: landscape) {
+	.ui-mobile .ui-page {
+		min-height: 300px;
+        height: 100%;
+	}
+}
+/* Fouc */
+/* Non-js content hiding */
+/* Loading screen */
+.ui-loader {
+	display: none;
+	z-index: 9999999;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	border:0;
+}
+.ui-loader-default {
+	background: none;
+	filter: Alpha(Opacity=18);
+	opacity: .18;
+	width: 2.875em;
+	height: 2.875em;
+	margin-left: -1.4375em;
+	margin-top: -1.4375em;
+}
+.ui-loader-default h1 {
+	font-size: 0;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+}
+.ui-loader .ui-icon-loading {
+	background-color: #000;
+	display: block;
+	margin: 0;
+	width: 2.75em;
+	height: 2.75em;
+	padding: .0625em;
+	-webkit-border-radius: 2.25em;
+	border-radius: 2.25em;
+}
+/* Headers, content panels */
+/* Corner styling for dialogs and popups */
+/* Buttons and icons */
+.ui-btn {
+	font-size: 16px;
+	margin: .5em 0;
+	padding: .7em 1em;
+	display: block;
+	position: relative;
+	text-align: center;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.ui-btn-icon-notext,
+
+ {
+	padding: 0;
+	width: 1.75vw;
+	height: 1.75vw;
+	text-indent: -9999px;
+	white-space: nowrap !important;
+}
+/* Make buttons in toolbars default to mini and inline. */
+/* To ensure same top and left/right position when ui-btn-left/right are added to something other than buttons. */
+.ui-btn-icon-notext:after {
+	content: "";
+	position: absolute;
+	display: block;
+	width: 22px;
+	height: 22px;
+}
+.ui-btn-icon-notext:after,
+
+ {
+	top: 50%;
+	margin-top: -11px;
+}
+.ui-btn-icon-notext:after,
+
+ {
+	left: 50%;
+	margin-left: -11px;
+}
+/* Buttons in header position classes */
+.ui-btn-right {
+	position: absolute;
+	top: .24em;
+}
+.ui-btn-right {
+	right: .4em;
+}
+.ui-btn-icon-notext.ui-btn-right {
+	top: .3125em;
+	right: .3125em;
+}
+/* Button elements */
+/* Firefox adds a 1px border in a button element. We negate this to make sure they have the same height as other buttons in controlgroups. */
+/* Form labels */
+.ui-mobile label,
+ {
+	display: block;
+	margin: 0 0 .4em;
+}
+/* Accessible content hiding */
+/* ui-hide-label deprecated in 1.4. TODO: Remove in 1.5 */
+/* Used for hiding elements by the filterable widget. You can also use this class to hide list items or buttons in controlgroups; this ensures correct corner styling. */
+.ui-screen-hidden {
+	display: none !important;
+}
+/* Transitions originally inspired by those from jQtouch, nice work, folks */
+.in {
+	-webkit-animation-timing-function: ease-out;
+	-webkit-animation-duration: 350ms;
+	-moz-animation-timing-function: ease-out;
+	-moz-animation-duration: 350ms;
+	animation-timing-function: ease-out;
+	animation-duration: 350ms;
+}
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@-webkit-keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@-moz-keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@-webkit-keyframes popin {
+    from {
+        -webkit-transform: scale(.8);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+}
+@-moz-keyframes popin {
+    from {
+        -moz-transform: scale(.8);
+        opacity: 0;
+    }
+    to {
+        -moz-transform: scale(1);
+        opacity: 1;
+    }
+}
+@keyframes popin {
+    from {
+        transform: scale(.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+@-webkit-keyframes popout {
+    from {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        -webkit-transform: scale(.8);
+        opacity: 0;
+    }
+}
+@-moz-keyframes popout {
+    from {
+        -moz-transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        -moz-transform: scale(.8);
+        opacity: 0;
+    }
+}
+@keyframes popout {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(.8);
+        opacity: 0;
+    }
+}
+/* keyframes for slidein from sides */
+@-webkit-keyframes slideinfromright {
+    from { -webkit-transform: translate3d(100%,0,0); }
+    to { -webkit-transform: translate3d(0,0,0); }
+}
+@-moz-keyframes slideinfromright {
+    from { -moz-transform: translateX(100%); }
+    to { -moz-transform: translateX(0); }
+}
+@keyframes slideinfromright {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+@-webkit-keyframes slideinfromleft {
+    from { -webkit-transform: translate3d(-100%,0,0); }
+    to { -webkit-transform: translate3d(0,0,0); }
+}
+@-moz-keyframes slideinfromleft {
+    from { -moz-transform: translateX(-100%); }
+    to { -moz-transform: translateX(0); }
+}
+@keyframes slideinfromleft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+/* keyframes for slideout to sides */
+@-webkit-keyframes slideouttoleft {
+    from { -webkit-transform: translate3d(0,0,0); }
+    to { -webkit-transform: translate3d(-100%,0,0); }
+}
+@-moz-keyframes slideouttoleft {
+    from { -moz-transform: translateX(0); }
+    to { -moz-transform: translateX(-100%); }
+}
+@keyframes slideouttoleft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+@-webkit-keyframes slideouttoright {
+    from { -webkit-transform: translate3d(0,0,0); }
+    to { -webkit-transform: translate3d(100%,0,0); }
+}
+@-moz-keyframes slideouttoright {
+    from { -moz-transform: translateX(0); }
+    to { -moz-transform: translateX(100%); }
+}
+@keyframes slideouttoright {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+/* slide down */
+@-webkit-keyframes slideinfromtop {
+    from { -webkit-transform: translateY(-100%); }
+    to { -webkit-transform: translateY(0); }
+}
+@-moz-keyframes slideinfromtop {
+    from { -moz-transform: translateY(-100%); }
+    to { -moz-transform: translateY(0); }
+}
+@keyframes slideinfromtop {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+@-webkit-keyframes slideouttotop {
+    from { -webkit-transform: translateY(0); }
+    to { -webkit-transform: translateY(-100%); }
+}
+@-moz-keyframes slideouttotop {
+    from { -moz-transform: translateY(0); }
+    to { -moz-transform: translateY(-100%); }
+}
+@keyframes slideouttotop {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100%); }
+}
+/* slide up */
+@-webkit-keyframes slideinfrombottom {
+    from { -webkit-transform: translateY(100%); }
+    to { -webkit-transform: translateY(0); }
+}
+@-moz-keyframes slideinfrombottom {
+    from { -moz-transform: translateY(100%); }
+    to { -moz-transform: translateY(0); }
+}
+@keyframes slideinfrombottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+@-webkit-keyframes slideouttobottom {
+    from { -webkit-transform: translateY(0); }
+    to { -webkit-transform: translateY(100%); }
+}
+@-moz-keyframes slideouttobottom {
+    from { -moz-transform: translateY(0); }
+    to { -moz-transform: translateY(100%); }
+}
+@keyframes slideouttobottom {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+}
+/* The properties in this rule are only necessary for the 'flip' transition.
+ * We need specify the perspective to create a projection matrix. This will add
+ * some depth as the element flips. The depth number represents the distance of
+ * the viewer from the z-plane. According to the CSS3 spec, 1000 is a moderate
+ * value.
+ */
+@-webkit-keyframes flipouttoleft {
+    from { -webkit-transform: rotateY(0); }
+    to { -webkit-transform: rotateY(-90deg) scale(.9); }
+}
+@-moz-keyframes flipouttoleft {
+    from { -moz-transform: rotateY(0); }
+    to { -moz-transform: rotateY(-90deg) scale(.9); }
+}
+@keyframes flipouttoleft {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(-90deg) scale(.9); }
+}
+@-webkit-keyframes flipouttoright {
+    from { -webkit-transform: rotateY(0) ; }
+    to { -webkit-transform: rotateY(90deg) scale(.9); }
+}
+@-moz-keyframes flipouttoright {
+    from { -moz-transform: rotateY(0); }
+    to { -moz-transform: rotateY(90deg) scale(.9); }
+}
+@keyframes flipouttoright {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(90deg) scale(.9); }
+}
+@-webkit-keyframes flipintoleft {
+    from { -webkit-transform: rotateY(-90deg) scale(.9); }
+    to { -webkit-transform: rotateY(0); }
+}
+@-moz-keyframes flipintoleft {
+    from { -moz-transform: rotateY(-90deg) scale(.9); }
+    to { -moz-transform: rotateY(0); }
+}
+@keyframes flipintoleft {
+    from { transform: rotateY(-90deg) scale(.9); }
+    to { transform: rotateY(0); }
+}
+@-webkit-keyframes flipintoright {
+    from { -webkit-transform: rotateY(90deg) scale(.9); }
+    to { -webkit-transform: rotateY(0); }
+}
+@-moz-keyframes flipintoright {
+    from { -moz-transform: rotateY(90deg) scale(.9); }
+    to { -moz-transform: rotateY(0); }
+}
+@keyframes flipintoright {
+    from { transform: rotateY(90deg) scale(.9); }
+    to { transform: rotateY(0); }
+}
+/* The properties in this rule are only necessary for the 'flip' transition.
+ * We need specify the perspective to create a projection matrix. This will add
+ * some depth as the element flips. The depth number represents the distance of
+ * the viewer from the z-plane. According to the CSS3 spec, 1000 is a moderate
+ * value.
+ */
+@-webkit-keyframes flipouttoleft {
+    from { -webkit-transform: rotateY(0); }
+    to { -webkit-transform: rotateY(-90deg) scale(.9); }
+}
+@-moz-keyframes flipouttoleft {
+    from { -moz-transform: rotateY(0); }
+    to { -moz-transform: rotateY(-90deg) scale(.9); }
+}
+@keyframes flipouttoleft {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(-90deg) scale(.9); }
+}
+@-webkit-keyframes flipouttoright {
+    from { -webkit-transform: rotateY(0) ; }
+    to { -webkit-transform: rotateY(90deg) scale(.9); }
+}
+@-moz-keyframes flipouttoright {
+    from { -moz-transform: rotateY(0); }
+    to { -moz-transform: rotateY(90deg) scale(.9); }
+}
+@keyframes flipouttoright {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(90deg) scale(.9); }
+}
+@-webkit-keyframes flipintoleft {
+    from { -webkit-transform: rotateY(-90deg) scale(.9); }
+    to { -webkit-transform: rotateY(0); }
+}
+@-moz-keyframes flipintoleft {
+    from { -moz-transform: rotateY(-90deg) scale(.9); }
+    to { -moz-transform: rotateY(0); }
+}
+@keyframes flipintoleft {
+    from { transform: rotateY(-90deg) scale(.9); }
+    to { transform: rotateY(0); }
+}
+@-webkit-keyframes flipintoright {
+    from { -webkit-transform: rotateY(90deg) scale(.9); }
+    to { -webkit-transform: rotateY(0); }
+}
+@-moz-keyframes flipintoright {
+    from { -moz-transform: rotateY(90deg) scale(.9); }
+    to { -moz-transform: rotateY(0); }
+}
+@keyframes flipintoright {
+    from { transform: rotateY(90deg) scale(.9); }
+    to { transform: rotateY(0); }
+}
+/* flow transition */
+@-webkit-keyframes flowouttoleft {
+    0% { -webkit-transform: translateX(0) scale(1); }
+	60%, 70% { -webkit-transform: translateX(0) scale(.7); }
+    100% { -webkit-transform: translateX(-100%) scale(.7); }
+}
+@-moz-keyframes flowouttoleft {
+    0% { -moz-transform: translateX(0) scale(1); }
+	60%, 70% { -moz-transform: translateX(0) scale(.7); }
+    100% { -moz-transform:  translateX(-100%) scale(.7); }
+}
+@keyframes flowouttoleft {
+    0% { transform: translateX(0) scale(1); }
+	60%, 70% { transform: translateX(0) scale(.7); }
+    100% { transform:  translateX(-100%) scale(.7); }
+}
+@-webkit-keyframes flowouttoright {
+    0% { -webkit-transform: translateX(0) scale(1); }
+	60%, 70% { -webkit-transform: translateX(0) scale(.7); }
+    100% { -webkit-transform:  translateX(100%) scale(.7); }
+}
+@-moz-keyframes flowouttoright {
+    0% { -moz-transform: translateX(0) scale(1); }
+	60%, 70% { -moz-transform: translateX(0) scale(.7); }
+    100% { -moz-transform:  translateX(100%) scale(.7); }
+}
+@keyframes flowouttoright {
+    0% { transform: translateX(0) scale(1); }
+	60%, 70% { transform: translateX(0) scale(.7); }
+    100% { transform:  translateX(100%) scale(.7); }
+}
+@-webkit-keyframes flowinfromleft {
+    0% { -webkit-transform: translateX(-100%) scale(.7); }
+	30%, 40% { -webkit-transform: translateX(0) scale(.7); }
+    100% { -webkit-transform: translateX(0) scale(1); }
+}
+@-moz-keyframes flowinfromleft {
+    0% { -moz-transform: translateX(-100%) scale(.7); }
+	30%, 40% { -moz-transform: translateX(0) scale(.7); }
+    100% { -moz-transform: translateX(0) scale(1); }
+}
+@keyframes flowinfromleft {
+    0% { transform: translateX(-100%) scale(.7); }
+	30%, 40% { transform: translateX(0) scale(.7); }
+    100% { transform: translateX(0) scale(1); }
+}
+@-webkit-keyframes flowinfromright {
+    0% { -webkit-transform: translateX(100%) scale(.7); }
+	30%, 40% { -webkit-transform: translateX(0) scale(.7); }
+    100% { -webkit-transform: translateX(0) scale(1); }
+}
+@-moz-keyframes flowinfromright {
+    0% { -moz-transform: translateX(100%) scale(.7); }
+	30%, 40% { -moz-transform: translateX(0) scale(.7); }
+    100% { -moz-transform: translateX(0) scale(1); }
+}
+@keyframes flowinfromright {
+    0% { transform: translateX(100%) scale(.7); }
+	30%, 40% { transform: translateX(0) scale(.7); }
+    100% { transform: translateX(0) scale(1); }
+}
+@media (min-width: 28em) {
+	/* ui-hide-label deprecated in 1.4. TODO: Remove in 1.5 */
+}
+/* content configurations. */
+/* force new row */
+/* No margin in grids for 100% width button elements until we can use max-width: fill-available; */
+/* preset breakpoint to switch to stacked grid styles below 35em (560px) */
+@media (max-width: 35em) {
+}
+/* fixed page header & footer configuration */
+/* updatePagePadding() will update the padding to actual height of header and footer. */
+/* Tap toggle: hide external fixed footer. See issue #6604 */
+/* workarounds for other widgets */
+/* fixes gaps caused by subpixel problem */
+/* Hide the native input element */
+/* Fixes IE/WP filter alpha opacity bugs */
+/* Fixes legend not wrapping on IE10 */
+.ui-popup-open .ui-header-fixed,
+.ui-popup-open .ui-footer-fixed {
+	position: absolute !important; /* See issues #4816, #4844 and #4874 and popup.js */
+}
+.ui-popup-screen {
+	background-image: url("data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="); /* Necessary to set some form of background to ensure element is clickable in IE6/7. While legacy IE won't understand the data-URI'd image, it ensures no additional requests occur in all other browsers with little overhead. */
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 1px;
+	position: absolute;
+	filter: Alpha(Opacity=0);
+	opacity: 0;
+	z-index: 1099;
+}
+.ui-popup-screen.in {
+	opacity: 0.5;
+	filter: Alpha(Opacity=50);
+}
+.ui-popup-screen.out {
+	opacity: 0;
+	filter: Alpha(Opacity=0);
+}
+.ui-popup-container {
+	z-index: 1100;
+	display: inline-block;
+	position: absolute;
+	padding: 0;
+	outline: 0;
+}
+.ui-popup {
+	position: relative;
+	border-radius: 30px;
+}
+.ui-popup.ui-body-inherit {
+	border-width: 1px;
+	border-style: solid;
+}
+.ui-popup-hidden {
+	left: 0;
+	top: 0;
+	position: absolute !important;
+	visibility: hidden;
+}
+.ui-popup-truncate {
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(1px,1px,1px,1px);
+}
+.ui-popup.ui-content,
+.ui-popup .ui-content {
+	overflow: visible;
+}
+.ui-popup > .ui-header {
+	border-top-width: 0;
+}
+.ui-popup > .ui-footer {
+	border-bottom-width: 0;
+}
+.ui-popup > p,
+.ui-popup > h1,
+.ui-popup > h2,
+.ui-popup > h3,
+.ui-popup > h4,
+.ui-popup > h5,
+.ui-popup > h6 {
+	margin: .5em .4375em;
+}
+.ui-popup > span {
+	display: block;
+	margin: .5em .4375em;
+}
+.ui-popup-container .ui-content > p,
+.ui-popup-container .ui-content > h1,
+.ui-popup-container .ui-content > h2,
+.ui-popup-container .ui-content > h3,
+.ui-popup-container .ui-content > h4,
+.ui-popup-container .ui-content > h5,
+.ui-popup-container .ui-content > h6 {
+	margin: .5em 0;
+}
+.ui-popup-container .ui-content > span {
+	margin: 0;
+}
+.ui-popup-container .ui-content > p:first-child,
+.ui-popup-container .ui-content > h1:first-child,
+.ui-popup-container .ui-content > h2:first-child,
+.ui-popup-container .ui-content > h3:first-child,
+.ui-popup-container .ui-content > h4:first-child,
+.ui-popup-container .ui-content > h5:first-child,
+.ui-popup-container .ui-content > h6:first-child {
+	margin-top: 0;
+}
+.ui-popup-container .ui-content > p:last-child,
+.ui-popup-container .ui-content > h1:last-child,
+.ui-popup-container .ui-content > h2:last-child,
+.ui-popup-container .ui-content > h3:last-child,
+.ui-popup-container .ui-content > h4:last-child,
+.ui-popup-container .ui-content > h5:last-child,
+.ui-popup-container .ui-content > h6:last-child {
+	margin-bottom: 0;
+}
+.ui-popup > img {
+	max-width: 100%;
+	max-height: 100%;
+	vertical-align: middle;
+}
+.ui-popup:not(.ui-content) > img:only-child,
+.ui-popup:not(.ui-content) > .ui-btn-left:first-child + img:last-child,
+.ui-popup:not(.ui-content) > .ui-btn-right:first-child + img:last-child {
+	-webkit-border-radius: inherit;
+	border-radius: inherit;
+}
+.ui-popup iframe {
+	vertical-align: middle;
+	border-radius: 30px;
+}
+.ui-popup > .ui-btn-left,
+.ui-popup > .ui-btn-right {
+	position: absolute; 
+	top: -11px;
+	margin: 0;
+	z-index: 1101;
+}
+.ui-popup > .ui-btn-left {
+	left: -11px;
+}
+.ui-popup > .ui-btn-right {
+	right: -11px;
+}
+/* Dimensions related to the popup arrow
+-----------------------------------------------------------------------------------------------------------*/
+/* desired triangle height: 10px */
+/**
+ * guide for the arrow - its width, height, and offset are theme-dependent and
+ * should be expessed as left, right, top, bottom, so that the element bearing
+ * such a class becomes stretched inside its parent position: relative element.
+ * The left/top/right/bottom specified below should reflect the corresponding
+ * border radii and so it leaves room for the shadow:
+ *     ..--------------------..
+ *   ."        ^ top           ".
+ *  /          v                 \
+ * |     +------------------+     |
+ * |     |                  |     |
+ * | left|                  |right|
+ * |<--->|                  |<--->|
+ * |     +------------------+     |
+ *  \          ^                 /
+ *   `.        v bottom        .'
+ *     ""--------------------""
+ * The idea is that the top/left of the arrow container box does not move to a
+ * coordinate smaller than the top/left of the guide and the right/bottom of
+ * the arrow container box does not move to a coordinate larger than the
+ * bottom/right of the guide. This will help us avoid the following situation:
+ *        ..--------------------..
+ *      ."        ^ top           ".
+ *   /|/          v                 \
+ *  / |     +------------------+     |
+ *  \ |     |                  |     |
+ *   \| left|                  |right|
+ *    |<--->|                  |<--->|
+ *    |     +------------------+     |
+ *     \          ^                 /
+ *      `.        v bottom        .'
+ *        ""--------------------""
+ * The arrow should not receive a top/left coordinate such that it is too close
+ * to one of the corners, because then at first the shadow of the arrow and,
+ * given a coordinate even closer to the corner, even the body of the arrow will
+ * "stick out" of the corner of the popup. The guide provides a hint to the
+ * arrow positioning code as to which range of values is acceptable for the
+ * arrow container's top/left coordinate.
+ **/
+.ui-popup-arrow-container {
+	width: 20px;
+	height: 20px;
+}
+/* aside from the "infinities" (-1000,2000), triangle height is used */
+.ui-popup-arrow-container.ui-popup-arrow-l {
+	left: -10px;
+	clip: rect(-1000px,10px,2000px,-1000px);
+}
+.ui-popup-arrow-container.ui-popup-arrow-t {
+	top: -10px;
+	clip: rect(-1000px,2000px,10px,-1000px);
+}
+.ui-popup-arrow-container.ui-popup-arrow-r {
+	right: -10px;
+	clip: rect(-1000px,2000px,2000px,10px);
+}
+.ui-popup-arrow-container.ui-popup-arrow-b {
+	bottom: -10px;
+	clip: rect(10px,2000px,1000px,-1000px);
+}
+/**
+ * For each side, the arrow is twice the desired size and its corner is aligned
+ * with the edge of the container:
+ *                                           
+ *           /\         /\                +----+       /\
+ *          /  \       /  \               | /\ |top   /  \
+ *      +----+  \     /  +----+       +-->|/  \|     /    \
+ *  left| /  |   \   /   |  \ |right  |   |    |    /      \
+ *      |/   |    \ /    |   \|       |  /|    |\  /        \
+ *      |\   |    / \    |   /|       | / +----+ \ \ +----+ /
+ *      | \  |   /   \   |  / |       | \        /  \|    |/
+ *      +----+  /     \  +----+       |  \      /    |    |
+ *       ^  \  /       \  /  ^        |   \    /  +->|\  /|
+ *       |   \/         \/   |        |    \  /   |  | \/ |bottom
+ *       |                   |        |     \/    |  +----+
+ *       +-------------------+--------+-----------+
+ *                           |
+ *                    arrow container
+ *                     (clips arrow)
+ **/
+.ui-popup-arrow-container .ui-popup-arrow {
+	/* (4*desired triangle height)/sqrt(2) - does not account for border - centred within the outer rectangle */
+	width: 28.284271247px;
+	height: 28.284271247px;
+	border-width: 1px;
+	border-style: solid;
+}
+.ui-popup-arrow-container.ui-popup-arrow-t .ui-popup-arrow {
+	left: -4.142135623px;
+	top: 5.857864376px;
+}
+.ui-popup-arrow-container.ui-popup-arrow-b .ui-popup-arrow {
+	left: -4.142135623px;
+	top: -14.142135623px;
+}
+.ui-popup-arrow-container.ui-popup-arrow-l .ui-popup-arrow {
+	left: 5.857864376px;
+	top: -4.142135623px;
+}
+.ui-popup-arrow-container.ui-popup-arrow-r .ui-popup-arrow {
+	left: -14.142135623px;
+	top: -4.142135623px;
+}
+/* Fix rotation center for oldIE - see http://www.useragentman.com/IETransformsTranslator/ */
+.ui-popup-arrow-container.ui-popup-arrow-t.ie .ui-popup-arrow {
+    margin-left: -5.857864376269049px;
+    margin-top: -7.0710678118654755px;
+}
+.ui-popup-arrow-container.ui-popup-arrow-b.ie .ui-popup-arrow {
+    margin-left: -5.857864376269049px;
+    margin-top: -4.142135623730951px;
+}
+ 
+.ui-popup-arrow-container.ui-popup-arrow-l.ie .ui-popup-arrow {
+    margin-left: -7.0710678118654755px;
+    margin-top: -5.857864376269049px;
+}
+.ui-popup-arrow-container.ui-popup-arrow-r.ie .ui-popup-arrow {
+    margin-left: -4.142135623730951px;
+    margin-top: -5.857864376269049px;
+}
+/* structure */
+.ui-popup > .ui-popup-arrow-guide {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	visibility: hidden;
+}
+.ui-popup-arrow-container {
+	position: absolute;
+}
+.ui-popup-arrow {
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	position: absolute;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+.ui-popup-arrow-container.ie .ui-popup-arrow {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865474, M12=-0.7071067811865477, M21=0.7071067811865477, M22=0.7071067811865474, SizingMethod='auto expand')";
+	filter: progid:DXImageTransform.Microsoft.Matrix(
+	      	M11=0.7071067811865474,
+        	M12=-0.7071067811865477,
+        	M21=0.7071067811865477,
+        	M22=0.7071067811865474,
+        	SizingMethod='auto expand');
+}
+/* Native input positioning */
+@-moz-document url-prefix() {
+	.ui-select .ui-btn select {
+		opacity: 0.0001;
+	}
+}
+/* Display none because of issues with IE/WP's filter alpha opacity */
+/* Because we add all classes of the select and option elements to the span... */ 
+/* ui-li-count is styled in the listview CSS. We set padding and offset here because select supports icon position while listview doesn't. */
+/* We set the rules for the span as well to fix an issue on Chrome with text-overflow ellipsis for the button in combination with text-align center. */
+/* when no placeholder is defined in a multiple select, the header height doesn't even extend past the close button.  this shim's content in there */
+/* ui-li-has-icon deprecated in 1.4. TODO: remove in 1.5 */
+/* Used by both listview and custom multiple select button */
+/* ui-li-has-icon deprecated in 1.4. TODO: remove in 1.5 */
+.ui-slider-input::-webkit-outer-spin-button,
+.ui-slider-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+/* High level of specificity to override button margins in grids */
+/* reset the clearfix */
+/* The corner radii for ui-slider-switch/track can be specified in theme CSS. The bg and handle inherits. */
+/* ui-hide-label deprecated in 1.4. TODO: Remove in 1.5 */
+/* slider tooltip
+-----------------------------------------------------------------------------------------------------------*/
+/* this makes ie6 and ie7 set height to 0 to fix z-index problem */
+html >/**/body .ui-rangeslider .ui-rangeslider-sliders .ui-slider-track:first-child {
+	height: 15px;
+	border-width: 1px;
+}
+html >/**/body .ui-rangeslider.ui-mini .ui-rangeslider-sliders .ui-slider-track:first-child {
+	height: 12px;
+}
+/* Hide the second label (the first is moved outside the div) */
+/* Same margin for mini textareas as other mini sized widgets (12.5/14 * 0.5em) */
+/* Padding on the div instead of input because of browser spinners etc. */
+/* Search icon */
+/* Resolves issue #5166: Added to support issue introduced in Firefox 15. We can likely remove this in the future. */
+/* Same for IE10 */
+.ui-input-text input:-ms-input-placeholder,
+.ui-input-search input:-ms-input-placeholder,
+textarea.ui-input-text:-ms-input-placeholder {
+	color: #aaa;
+}
+/* Resolves issue #5131: Width of textinput depends on its type,
+for Android 4.1 */
+.ui-input-text input[type=number]::-webkit-outer-spin-button {
+	margin: 0;
+}
+/* Resolves issue #5756: Textinput in IE10 has a default clear button */
+.ui-input-text input::-ms-clear,
+.ui-input-search input::-ms-clear {
+	display: none;
+}
+/* Override field container CSS to prevent the flipswitch from becomming full width */
+/*
+ Styles for the table columntoggle mode
+*/
+/* Remove top/bottom margins around the fieldcontain on check list */
+/* Hide all prioritized columns by default */
+@media only all {
+}
+/* Preset breakpoints if ".ui-responsive" class added to table */
+/* Show priority 1 at 320px (20em x 16px) */
+@media screen and (min-width: 20em) {
+}
+/* Show priority 2 at 480px (30em x 16px) */
+@media screen and (min-width: 30em) {
+}
+/* Show priority 3 at 640px (40em x 16px) */
+@media screen and (min-width: 40em) {
+}
+/* Show priority 4 at 800px (50em x 16px) */
+@media screen and (min-width: 50em) {
+}
+/* Show priority 5 at 960px (60em x 16px) */
+@media screen and (min-width: 60em) {
+}
+/* Show priority 6 at 1,120px (70em x 16px) */
+@media screen and (min-width: 70em) {
+}
+/* Unchecked manually: Always hide */
+/* Checked manually: Always show */
+/*
+ Styles for the table columntoggle mode
+*/
+/* Mobile first styles: Begin with the stacked presentation at narrow widths */ 
+@media only all {
+	/* Hide the table headers */ 
+	/* Show the table cells as a block level element */ 
+	/* Add a fair amount of top margin to visually separate each row when stacked */  
+	/* Make the label elements a percentage width */ 
+	/* For grouped headers, have a different style to visually separate the levels by classing the first label in each col group */ 
+}
+/* Breakpoint to show as a standard table at 560px (35em x 16px) or wider */ 
+@media ( min-width: 35em ) {
+	/* Show the table header rows */ 
+	/* Hide the labels in each cell */ 
+}
+/* Hack to make IE9 and WP7.5 treat cells like block level elements, scoped to ui-responsive class */ 
+/* Applied in a max-width media query up to the table layout breakpoint so we don't need to negate this*/ 
+@media ( max-width: 35em ) {
+}
+/* Panel */
+/* Container, page and wrapper */
+/* Fixed toolbars */
+/* Dismiss */
+/* Animate class is added to panel, wrapper and fixed toolbars */
+/* Fix for Windows Phone issue #6349: unset the transition for transforms in case of fixed toolbars. */
+@media screen and ( max-device-width: 768px ) {
+	/* We need a transitionend event ... */
+}
+/* Hardware acceleration for smoother transitions on WebKit browsers */
+/* Panel positioning (for overlay and push) */
+/* Panel left closed */
+/* Panel left closed animated */
+/* Panel left open */
+/* Panel left open animated */
+/* Panel right closed */
+/* Panel right closed animated */
+/* Panel right open */
+/* Panel right open animated */
+/* Wrapper and fixed toolbars positioning (for reveal and push) */
+/* Panel left open */
+/* Panel left open animated */
+/* Panel right open */
+/* Panel right open animated */
+/* Dismiss model open */
+/* Shadows and borders */
+/* Responsive: wrap on wide viewports once open */
+@media (min-width:55em) {
+}
