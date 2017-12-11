@@ -771,7 +771,7 @@ def toggleFan():
 @app.route('/info')
 def info_form():
 	status = thermCursor.execute('SELECT * FROM status').fetchone()
-	schedule = (getModeHTML(status)
+	schedule = (getModeHTML(status)[0]
 					.replace('targetTemps"','targetTemps" style="display:inline-block;"')
 					.replace('target-heat"', 'target-heat" style="display:inline-block;width: 135px;"')
 					.replace('target-cool"', 'target-cool" style="display:inline-block;width: 135px;"'))
