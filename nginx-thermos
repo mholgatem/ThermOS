@@ -19,7 +19,7 @@ server {
   location / {
     include proxy_params;
     proxy_pass http://unix:/home/pi/ThermOS/thermos.sock;
-    try_files $uri $uri/ =404;
+    #try_files $uri $uri/ =404;
 
     # The Expires HTTP header is a basic means of controlling caches; it tells all caches how long 
     # the associated representation is fresh for. After that time, caches will always check back with 
