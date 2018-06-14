@@ -329,7 +329,7 @@ def schedule_form():
 @app.route('/schedule/delete', methods=['POST'])
 def schedule_delete():
 	if 'id' in request.form:
-		thermCursor.execute('DELETE FROM schedule WHERE id = (?)',request.form['id'])
+		thermCursor.execute('DELETE FROM schedule WHERE id = (?)',(request.form['id'],))
 		thermConn.commit()
 		reloadDaemon()
 	return redirect(url_for('schedule_form'))
