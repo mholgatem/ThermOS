@@ -1,9 +1,129 @@
 server {
-    listen 80;
-    server_name server_domain_or_IP;
+  # .domain.com will match both domain.com and anything.domain.com
+  listen 80;
+  server_name server_domain_or_IP;
+ 
+  # It is best to place the root of the server block at the server level, and not the location level
+  # any location block path will be relative to this root. 
+  root /home/pi/ThermOS;
 
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/home/pi/ThermOS/thermos.sock;
-    }
+  # It's always good to set logs, note however you cannot turn off the error log
+  # setting error_log off; will simply create a file called 'off'.
+  access_log /var/log/nginx/example.access.log;
+  error_log /var/log/nginx/example.error.log;
+
+  # This can also go in the http { } level
+  index index.html index.htm index.php;
+
+  # web app
+  location / {
+    include proxy_params;
+    proxy_pass http://unix:/home/pi/ThermOS/thermos.sock;
+    try_files $uri $uri/ =404;
+
+    # The Expires HTTP header is a basic means of controlling caches; it tells all caches how long 
+    # the associated representation is fresh for. After that time, caches will always check back with 
+    # the origin server to see if a document is changed.
+    #
+    # "If a request includes the no-cache directive, it SHOULD NOT include min-fresh, max-stale, or max-age." 
+    # (source: http://www.ietf.org/rfc/rfc2616.txt, p114)
+    #
+    # A negative value means that the response expires immediately.
+    # Nginx automatically sets the `Cache-Control: no-cache` header, if `expires` is negative
+    #
+    expires           -1;
+  }
+
+  # this block will catch files that might need to change immediately (e. g. to deploy hotfixes), such as js or css
+  # The ?: prefix is a 'non-capturing' mark, meaning we do not require
+  # the pattern to be captured into $1 which should help improve performance
+  location ~* \.(?:css|js)$ {
+    access_log        off;
+    log_not_found     off;
+
+    # no-cache:         forces caches to submit the request to the origin server for validation before releasing a 
+    #                   cached copy, every time. This is useful to assure that authentication is respected 
+    #                   (in combination with public), or to maintain rigid freshness, without sacrificing all of the 
+    #                   benefits of caching.
+    # 
+    # public:           marks authenticated responses as cacheable; normally, if HTTP authentication is required, 
+    #                   responses are automatically private.
+    #
+    # must-revalidate:  tells caches that they must obey any freshness information you give them about a 
+    #                   representation. HTTP allows caches to serve stale representations under special conditions;
+    #                   by specifying this header, you’re telling the cache that you want it to strictly follow 
+    #                   your rules.
+    # 
+    # proxy-revalidate: similar to must-revalidate, except that it only applies to proxy caches.
+    # 
+    add_header        Cache-Control "no-cache, public, must-revalidate, proxy-revalidate";
+  }
+
+  # This block will catch static file requests, such as images
+  # The ?: prefix is a 'non-capturing' mark, meaning we do not require
+  # the pattern to be captured into $1 which should help improve performance
+  location ~* \.(?:jpg|jpeg|gif|png|ico|xml)$ {
+    access_log        off;
+    log_not_found     off;
+
+    # The Expires HTTP header is a basic means of controlling caches; it tells all caches how long 
+    # the associated representation is fresh for. After that time, caches will always check back with 
+    # the origin server to see if a document is changed.
+    #
+    # "If a request includes the no-cache directive, it SHOULD NOT include min-fresh, max-stale, or max-age." 
+    # (source: http://www.ietf.org/rfc/rfc2616.txt, p114)
+    #
+    # Nginx automatically sets the `Cache-Control: max-age=t` header, if `expires` is present, where t is a time 
+    # specified in the directive, in seconds
+    #
+    #expires           5m;
+
+    # public:           marks authenticated responses as cacheable; normally, if HTTP authentication is required, 
+    #                   responses are automatically private.
+    # 
+    # add_header        Cache-Control "public";
+    add_header        Cache-Control "no-cache, public, must-revalidate, proxy-revalidate";
+  }
+  
+  # This block will catch static file requests of fonts and allows fonts to be requested via CORS
+  # The ?: prefix is a 'non-capturing' mark, meaning we do not require
+  # the pattern to be captured into $1 which should help improve performance
+  location ~* \.(?:eot|woff|woff2|ttf|svg|otf)$ {
+    access_log        off;
+    log_not_found     off;
+
+    # The Expires HTTP header is a basic means of controlling caches; it tells all caches how long
+    # the associated representation is fresh for. After that time, caches will always check back with
+    # the origin server to see if a document is changed.
+    #
+    # "If a request includes the no-cache directive, it SHOULD NOT include min-fresh, max-stale, or max-age."
+    # (source: http://www.ietf.org/rfc/rfc2616.txt, p114)
+    #
+    # Nginx automatically sets the `Cache-Control: max-age=t` header, if `expires` is present, where t is a time
+    # specified in the directive, in seconds
+    #
+    #expires           5m;
+
+    # public:           marks authenticated responses as cacheable; normally, if HTTP authentication is required,
+    #                   responses are automatically private.
+    #
+    # add_header        Cache-Control "public";
+    add_header        Cache-Control "no-cache, public, must-revalidate, proxy-revalidate";
+
+    # allow CORS requests
+    add_header        Access-Control-Allow-Origin *;
+
+    types     {font/opentype otf;}
+    types     {application/vnd.ms-fontobject eot;}
+    types     {font/truetype ttf;}
+    types     {application/font-woff woff;}
+    types     {font/x-woff woff2;}
+  }
+
+  # this prevents hidden files (beginning with a period) from being served
+  location ~ /\. { 
+    access_log        off; 
+    log_not_found     off; 
+    deny              all; 
+  }
 }
