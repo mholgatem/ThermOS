@@ -46,6 +46,7 @@ The following icons came from [thenounproject.com](https://thenounproject.com)<b
 *"Calendar"* (schedule icon) by **To Uyen**<br>
 *"Flame"* (heat icon) by **Nadav Barkan**<br>
 *"Snowflake"* (ac icon) by **Dilon Choudry**<br>
+*"Meter"* (Favicon) by **kiddo**<br>
 
 
 *This application is free, without restriction, or warranty.<br>
