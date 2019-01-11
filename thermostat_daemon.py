@@ -1,6 +1,7 @@
 #! /usr/bin/python -u
 from __future__ import print_function
 from datetime import *
+import mailman
 import os
 import RPi.GPIO as GPIO
 import scheduler
@@ -14,7 +15,7 @@ import time
 import forecastio
 import tempSensor
 
-__version__ = 2.3
+__version__ = 2.4
 
 # set working directory to where "thermos_daemon.py" is
 abspath = os.path.abspath(__file__)
@@ -233,33 +234,23 @@ class ThermOSDaemon(object):
         except:
             print("Error while saving log data: ", sys.exc_info()[0])
                     
-    def sendErrorMail(self, msg = "Thermostat Error", timeout = 10, frequency = timedelta(minutes=30)):
+    def sendErrorMail(self, msg = "Error", frequency = timedelta(minutes=30)):
         if self.config['mail_enabled']:
-            try:
-                msg = str(msg)
-                # don't spam user if error occurs
-                if not msg in self.mailLog or datetime.now() > (self.mailLog[msg] + frequency):
-                    self.mailLog[msg] = datetime.now()
-                    headers = ["From: " + self.config['sender'],
-                           "To: " + self.config['recipient'],
-                           "MIME-Version: 1.0",
-                           "Content-Type: text/html"]
-                    headers = "\r\n".join(headers)
-                    session = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'], timeout = timeout)
-                    session.ehlo()
-                    # you may need to comment this line out if you're a crazy person
-                    # and use non-tls SMTP servers
-                    session.starttls()
-                    session.ehlo
-                    session.login(self.config['username'], self.config['password'])
-                    session.sendmail(self.config['sender'], self.config['recipient'], 
-                                                                        headers + "\r\n\r\n" + msg)
-                    session.quit()
-            except smtplib.socket.timeout:
-                self.recordDebugLog("sendErrorMail() timed out!")
-            except:
-                self.recordDebugLog("sendErrorMail() had an error:\n{0}".format(sys.exc_info()[0]))
-    
+            successful, errorMsg = mailman.deliver(self.config, msg, frequency)
+            if not successful:
+                self.recordDebugLog(errorMsg)
+                
+    def getCommandMail(self, frequency = timedelta(minutes=5)):
+        """if self.config['mail_enabled']:
+            messages = mailman.collect(self.config, frequency, markSeen = True)
+            for x in messages:
+                print(x['sender'])
+                print(x['subject'])
+                print(x['body'])
+        """
+        pass
+            
+            
     def updateWeather(self):
         ''' icon:
                 clear-day, clear-night, rain, snow, sleet, wind, fog,
@@ -437,6 +428,7 @@ class ThermOSDaemon(object):
         self.thermostatMode = "OFF"
         self.activeTarget = 0
         self.inactiveTarget = 0
+        self.getCommandMail()
         while True:
             
             self.indoorTemp = tempSensor.getCurrent(self.config['units'], self.config['temperature_offset'])

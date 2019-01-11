@@ -570,10 +570,13 @@ def settings_submit():
 	mailElements = (	'float-error-threshold',
 						'text-smtp-server',
 						'int-smtp-port',
+                        'text-imap-server',
+                        'int-imap-port',
 						'text-username',
 						'text-password',
 						'text-sender',
-						'text-recipient')
+						'text-recipient',
+                        'text-access-code')
 		
 						
 	for key, value in request.form.iteritems():
@@ -617,12 +620,15 @@ def settings_submit():
 					formItems['text-username'],
 					formItems['text-password'],
 					formItems['text-sender'],
-					formItems['text-recipient']
+					formItems['text-recipient'],
+                    formItems['text-imap-server'],
+                    formItems['int-imap-port'],
+                    formItems['text-access-code']
 					)
 		
 		# save settings to thermostat.db
 		thermCursor.execute('DELETE FROM settings')
-		thermCursor.execute('INSERT INTO settings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', values)
+		thermCursor.execute('INSERT INTO settings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', values)
 		thermConn.commit()	
 		
 		# get globals (for setting later)

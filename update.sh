@@ -51,6 +51,15 @@ case $OLD_VERSION in
 		web=$SCRIPTPATH"/thermostat-web.service"
 		sudo cp $web /lib/systemd/system/
         ;&
+	"1.4")
+		UPDATE_VERSION=1.4
+		echo $UPDATE_VERSION > version
+        echo "Handling v1.4 updates..."
+		#Add imap to thermostat.db -> settings table
+		sqlite3 $SCRIPTPATH/logs/thermostat.db "ALTER TABLE settings ADD COLUMN imap_server TEXT"
+		sqlite3 $SCRIPTPATH/logs/thermostat.db "ALTER TABLE settings ADD COLUMN imap_port INTEGER"
+		sqlite3 $SCRIPTPATH/logs/thermostat.db "ALTER TABLE settings ADD COLUMN access_code TEXT"
+        ;&
 	"DONE")
 		wget -O version https://raw.githubusercontent.com/mholgatem/ThermOS/master/version
 		echo "Finished Updating...Restarting services."

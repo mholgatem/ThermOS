@@ -144,6 +144,16 @@
                 <label>SMTP Port:</label>
                 <input class="blue-letterpress" type="text" id="setting-smtp-port" name="int-smtp-port" value={{ config.smtp_port|default('', true) }}>
             </span>
+	    
+	    <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="The IMAP server of your choice (e.g. - imap.gmail.com)">
+                <label>IMAP Server:</label>
+                <input class="blue-letterpress" type="text" id="setting-imap-server" name="text-imap-server" value={{ config.imap_server|default('', true) }}>
+            </span>
+            
+            <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="SMTP port number (e.g. - 993)">
+                <label>IMAP Port:</label>
+                <input class="blue-letterpress" type="text" id="setting-imap-port" name="int-imap-port" value={{ config.imap_port|default('', true) }}>
+            </span>
             
             <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Username for sender account">
                 <label>Username:</label>
@@ -163,6 +173,11 @@
             <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="Recipient email or sms address">
                 <label>Recipient:</label>
                 <input class="blue-letterpress" type="text" id="setting-recipient" name="text-recipient" value={{ config.recipient|default('', true) }}>
+            </span>
+	    
+	    <span data-toggle="tooltip"  data-delay='{"show":"2000"}' title="This code is provided by the mobile app">
+                <label>Access Code:</label>
+                <input class="blue-letterpress" type="text" id="setting-access-code" name="text-access-code" value={{ config.access_code|default('', true) }}>
             </span>
         </div>
         <div style="border-top: 1px solid white;">
