@@ -124,13 +124,13 @@ def collect(config = {}, frequency = timedelta(seconds=30), markSeen = True):
                     
                     yield {"sender": sender, "subject": subject, "body": body}
                     
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            yield {"sender": "ERROR",
-                    "subject":"mailman.collect() had an error!",
-                    "body": ("{0} {1} {2} {3}").format(sys.exc_info()[0],exc_type, 
-                                                        fname, exc_tb.tb_lineno)}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        yield {"sender": "ERROR",
+                "subject":"mailman.collect() had an error!",
+                "body": ("{0} {1} {2} {3}").format(sys.exc_info()[0],exc_type, 
+                                                    fname, exc_tb.tb_lineno)}
 
-        conn.close()
+    conn.close()
         
