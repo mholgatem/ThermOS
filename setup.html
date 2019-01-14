@@ -32,7 +32,7 @@
 
 <h3><a id="user-content--ds18b20-" class="anchor" href="#-ds18b20-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>-DS18B20-</h3>
 
-<p>Your <strong><em>DATA</em></strong> line needs to be connected to your <strong><em>VDD/POWER</em></strong> line with a <strong><em>4.7K ohm resistor</em></strong><br>
+<p>Your <strong><em>DATA</em></strong> line needs to be connected to your <strong><em>3.3v POWER</em></strong> line with a <strong><em>4.7K ohm resistor</em></strong>(the resistor is used as a 'pullup' for the data-line)<br>
 Then do the following:<br>
 <strong><em>DATA</em> on gpio 4 (<em>physical pin 7</em>)<br>
 <em>VDD/POWER</em> on 5v rail (<em>physical pin 2</em>)<br>
@@ -52,7 +52,7 @@ by using an up-to-date <strong>raspi-config</strong> (Advanced Options -&gt; 1-W
 
 This section will vary depending on your system (my system uses a 4-wire ac/heat/fan/neutral).<br><strong>Avoid using physical pins 8 &amp; 10 (gpio 14 &amp; 15)</strong> as they will output a signal when the system is booting up, which would temporarily activate your system.<br><br> 
 
-  <strong>I recommend using physical pins 11, 13, &amp; 15 (GPIO 17, 27, &amp; 22)</strong>, but it's up to you. Then use physical pin 4 (5v) to control the logic chip on the ssr. You will tell the system which pins you are using while setting up the web interface.
+  <strong>I recommend using physical pins 11, 13, &amp; 15 (GPIO 17, 27, &amp; 22)</strong>, but it's up to you. Then use physical pin 4 (5v) to power the logic chip on the ssr. You will tell the system which pins you are using while setting up the web interface.
   
   
 </p><img src="images/setup-ssr.jpg"><h3><a id="user-content--software-" class="anchor" href="#-software-" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>-SOFTWARE-</h3>
@@ -79,7 +79,8 @@ sudo bash install.sh
 <em>"Wrench"</em> (settings icon) by <strong>useiconic.com</strong><br>
 <em>"Calendar"</em> (schedule icon) by <strong>To Uyen</strong><br>
 <em>"Flame"</em> (heat icon) by <strong>Nadav Barkan</strong><br>
-<em>"Snowflake"</em> (ac icon) by <strong>Dilon Choudry</strong><br></p>
+<em>"Snowflake"</em> (ac icon) by <strong>Dilon Choudry</strong><br>
+<em>"Meter"</em> (Favicon) by <strong>kiddo</strong><br></p>
 
 <p><em>This application is free, without restriction, or warranty.<br>
 Don't sue me bro!</em></p>
