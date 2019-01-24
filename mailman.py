@@ -12,7 +12,7 @@ config = {"sender":"example1@gmail.com",
           "recipient":"example2@gmail.com",
           "mail_enabled": True,
           "smtp_server": "smtp.gmail.com",
-          "outgoing_port": 587,
+          "smtp_port": 587,
           "username":"example1@gmail.com",
           "password":"password"}
 
@@ -41,8 +41,8 @@ def deliver(config = {}, msg = "Error", frequency = timedelta(minutes=30)):
     timeout = 10
     try:
         #Don't spam user if error occurs
-        if not msg in sendLog or datetime.now() > (sendLog[msg] + frequency):
-            sendLog[msg] = datetime.now()
+        if not msg in sendLog or datetime.now() > sendLog[msg]:
+            sendLog[msg] = datetime.now() + frequency
             #Create Form (Headers + Message)
             Form = ('From: {sender}\r\n'
                       + 'To: {recipient}\r\n'
@@ -82,7 +82,8 @@ def deliver(config = {}, msg = "Error", frequency = timedelta(minutes=30)):
         return False, ("mailman.deliver() had an error:\n{0} {1} {2} {3}"
                         ).format(sys.exc_info()[0],exc_type, 
                                  fname, exc_tb.tb_lineno)
-       #//TODO: SEND STRING TO DAEMON record.DebugLog
+    
+    return False, "Message being sent too frequently: {0}".format(msg)
            
 
 def collect(config = {}, frequency = timedelta(seconds=30), markSeen = True):
@@ -90,6 +91,7 @@ def collect(config = {}, frequency = timedelta(seconds=30), markSeen = True):
     try:
         if (lastCheck is False or datetime.now() > (lastCheck + frequency)):
             #Connect to imap server
+            lastCheck = datetime.now()
             conn = imaplib.IMAP4_SSL(config['imap_server'], config['imap_port'])
             (retcode, capabilities) = conn.login(config['username'], 
                                                  config['password'])
@@ -104,10 +106,13 @@ def collect(config = {}, frequency = timedelta(seconds=30), markSeen = True):
                     #get message portion of data
                     msg = email.message_from_string(data[0][1])
                     #set message to seen
-                    typ, data = conn.store(num,'+FLAGS','\\Seen')
+                    if markSeen:
+                        typ, data = conn.store(num,'+FLAGS','\\Seen')
+                    else:
+                        typ, data = conn.store(num,'-FLAGS','\\Seen')
                     #find sender & subject
                     sender = email.utils.parseaddr(msg['From'])[1]
-                    subject = email.header.decode_header(msg['Subject'])[0]
+                    subject = email.Header.decode_header(msg['Subject'])[0][0]
                     #find body if multipart message
                     if msg.is_multipart():
                         for part in msg.walk():
@@ -123,14 +128,11 @@ def collect(config = {}, frequency = timedelta(seconds=30), markSeen = True):
                         body = msg.get_payload(decode=True)
                     
                     yield {"sender": sender, "subject": subject, "body": body}
-                    
+                conn.close()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         yield {"sender": "ERROR",
                 "subject":"mailman.collect() had an error!",
-                "body": ("{0} {1} {2} {3}").format(sys.exc_info()[0],exc_type, 
+                "body": ("{0} {1} {2} line: {3}").format(sys.exc_info()[0],exc_type, 
                                                     fname, exc_tb.tb_lineno)}
-
-    conn.close()
-        
