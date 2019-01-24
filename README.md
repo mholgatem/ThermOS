@@ -32,6 +32,9 @@ sudo bash install.sh
 ```
 On a computer or smartphone, ***navigate to the ip address of your raspberry pi to finish setup***.
 
+### -NOTES-
+If you want to send updates with your thermostat using gmail, you need to [enable "Less secure app access"](https://myaccount.google.com/u/3/lesssecureapps?utm_source=google-account&utm_medium=web) on your thermostat's gmail account.
+
 ## Credits
 ThermOS started life as [Rubustat by Wyatt Winters](https://github.com/wywin/Rubustat) and quickly took on a life of it's own; but there are still a few bits of code left over from those early days.
 
