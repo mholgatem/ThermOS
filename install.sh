@@ -29,7 +29,7 @@ echo "Installing Dependencies..."
 echo
 
 sudo apt-get -y install python-pip python-dev sqlite3 nginx
-sudo pip install flask gunicorn pygal python-forecastio
+sudo pip install -r requirements.txt
 
 #create nginx server
 sudo cp $SCRIPTPATH"/nginx-thermos" /etc/nginx/sites-available/ThermOS
