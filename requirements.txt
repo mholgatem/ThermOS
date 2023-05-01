@@ -1,4 +1,4 @@
-Flask==1.1.1
+Flask==2.3.2
 gunicorn==19.9.0
 pygal==2.4.0
 python-forecastio==1.4.0
